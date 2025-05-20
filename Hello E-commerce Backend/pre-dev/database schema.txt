@@ -1,0 +1,196 @@
+core entities: Admin, Customer, Product
+customer actions: purchase, rating, view, add to cart, remove from cart, add to favorites, remove from favorites, request refund
+admin actions: warn customers, inspect statistics
+super admin actions: ban users, warn users, create admins, remove admins, inspect higher-level statistics
+
+Customer_Address {
+  id GUID (PK)
+  street string
+  city string
+  country string
+  postal_code string
+}
+
+Customer_Address_Details {
+  id GUID (PK)
+  customer_id GUID (FK)
+  address_id GUID (FK)
+}
+
+Admin {
+  id GUID (PK)
+  name string
+  email string
+  phone_number string
+  password string
+  salt string
+  created_at timestamp
+  updated_at timestamp
+  is_deleted Boolean
+  is_super_admin Boolean
+  created_by GUID (FK to User.id)
+}
+
+
+
+Customer {
+  id GUID (PK)
+  name string
+  email string
+  phone_number string
+  password string
+  salt string
+  created_at timestamp
+  updated_at timestamp
+  is_deleted Boolean
+  is_warned Boolean (false by default)
+  warning-level integer (nullable)
+  is_banned Boolean (false by default)
+  banned_days integer (nullable)
+  date_of_birth date
+  loyalty_points integer
+}
+
+Product {
+  id GUID (PK)
+  name string
+  description string
+  price_in_MMK decimal
+  SKU string
+  in_stock_quantity integer
+  rating decimal
+  created_at timestamp
+  updated_at timestamp
+  is_deleted Boolean
+}
+
+some customer actions are logged in a "CustomerAction" table.
+
+----Customer x Product----
+
+enum CustomerActionType {
+  "view",
+  "rate",
+  "refund"
+}
+
+CustomerAction {
+  id GUID (PK)
+  action_type CustomerActionType
+  customer_id GUID (FK)
+  product_id GUID (FK)
+  dateTime timestamp
+}
+
+View extends CustomerAction {
+  // inherits product_id
+}
+
+Rate extends CustomerAction {
+  rating integer
+}
+
+enum refundStatus {
+  "requested",
+  "approved",
+  "rejected"
+}
+
+Refund extends CustomerAction {
+  purchase_id GUID (FK)
+  reason string
+  status refundStatus
+}
+
+core transactions like purchasing and adding to cart are recorded in their dedicated tables. "Table per Hierarchy" feature of Entity Framework Core will be used.
+
+enum purchaseStatus {
+  "pending",
+  "completed",
+  "cancelled"
+}
+
+enum paymentMethod {
+  "kbzPay",
+  "uabPay",
+  "cbPay",
+  "ayaPay",
+  "wavePay",
+  "cash"
+}
+
+enum paymentOption {
+  "full",
+  "installment"
+}
+
+Purchase {
+  id GUID (PK)
+  customer_id GUID (FK)
+  timestamp timestamp
+  total_amount decimal
+  payment_method paymentMethod
+  payment_option paymentOption
+  shipping_address_id GUID (FK)
+  status purchaseStatus
+}
+
+PurchaseItem {
+  id GUID (PK)
+  purchase_id GUID (FK)
+  product_id GUID (FK)
+  quantity integer
+  unit_price decimal
+}
+
+Cart {
+  id GUID (PK)
+  customer_id GUID (FK)
+  created_at timestamp
+  updated_at timestamp
+  is_active Boolean (true by default)
+}
+
+CartItem {
+  id GUID (PK)
+  cart_id GUID (FK)
+  product_id GUID (FK)
+  quantity integer
+}
+
+Favorite {
+  id GUID (PK)
+  customer_id GUID (FK)
+  product_id GUID (FK)
+  added_at timestamp
+  is_removed Boolean (false by default)
+}
+
+
+----Customer x Admin----
+
+normal admins will be able to warn a customer, while super admins can ban one (including admins).
+
+enum AdminActionType {
+  "warn",
+  "ban"
+}
+
+AdminAction {
+  id GUID (PK)
+  admin_id GUID (FK)
+  target_user_id GUID (FK)
+  action_type AdminActionType
+  timestamp timestamp
+}
+
+Warn extends AdminAction {
+  reason string
+  severity integer (1-3)
+}
+
+Ban extends AdminAction {
+  reason string
+  duration_days integer
+}
+

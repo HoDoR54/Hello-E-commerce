@@ -1,0 +1,24 @@
+This is an admin-level interface and the user expected to be able to perform the following tasks.
+
+CORE FUNCTIONS:
+-check currently active/inactive users
+-create a new admin (if the user is a super admin)
+-ban/warn a user (or an admin if the user is a super admin)
+-view purchase logs
+-filter/reorder/compare purchase logs by time, region, age group, gender and product price range
+-view customers
+-filter/reorder customers by purchases, loyalty points and time created
+
+ADDITINOAL FUNCITONS:
+-update account details (name, password and email)
+-upload/update profile picture
+-view other users' profiles
+-notification
+
+NON-FUNCTIONAL REQUIREMENTS:
+-a logo
+-a professional UI/UX
+-scalability for a client-side platform
+-expendability for future mobile and Windows development
+
+for learning purposes all the customers, customer details, customer actions and products will be hardcoded.
