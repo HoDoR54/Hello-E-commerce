@@ -146,5 +146,23 @@ public class AppDbContext : DbContext
             .HasValue<Ban>(AdminActionType.Ban)
             .HasValue<Warn>(AdminActionType.Warn);
 
+
+        // seed the super admin account
+        modelBuilder.Entity<Admin>().HasData(new Admin
+        {
+            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+            Name = "Hpone Tauk Nyi",
+            Email = "hponetaukyou@gmail.com",
+            PhoneNumber = "+959890079614",
+            // bcrypt
+            Password = "$2a$12$90UrUp1k5/Zmzx9b3Ms8YunIR5.zexGCRLj3G/ztUVzFUpQpFAC7.",
+            IsSuperAdmin = true,
+            CreatedAt = new DateTime(2025, 05, 21, 12, 00, 00, DateTimeKind.Utc),
+            UpdatedAt = new DateTime(2025, 05, 21, 12, 00, 00, DateTimeKind.Utc),
+            IsDeleted = false,
+            CreatedBy = null
+        });
+
+
     }
 }

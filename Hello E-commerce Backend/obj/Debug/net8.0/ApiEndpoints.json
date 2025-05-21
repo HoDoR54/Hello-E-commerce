@@ -1,15 +1,15 @@
 [
   {
     "ContainingType": "E_commerce_Admin_Dashboard.Controllers.AuthController",
-    "Method": "RegisterAdmin",
-    "RelativePath": "api/auth/admin",
+    "Method": "AdminLogIn",
+    "RelativePath": "admin/login",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "request",
-        "Type": "E_commerce_Admin_Dashboard.DTO.Requests.AdminRegisterRequest",
+        "Name": "req",
+        "Type": "E_commerce_Admin_Dashboard.DTO.Requests.AdminLoginRequest",
         "IsRequired": true
       }
     ],

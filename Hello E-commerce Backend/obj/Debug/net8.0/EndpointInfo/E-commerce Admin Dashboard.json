@@ -5,7 +5,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/auth/admin": {
+    "/admin/login": {
       "post": {
         "tags": [
           "Auth"
@@ -14,17 +14,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AdminRegisterRequest"
+                "$ref": "#/components/schemas/AdminLoginRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AdminRegisterRequest"
+                "$ref": "#/components/schemas/AdminLoginRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AdminRegisterRequest"
+                "$ref": "#/components/schemas/AdminLoginRequest"
               }
             }
           }
@@ -39,8 +39,18 @@
   },
   "components": {
     "schemas": {
-      "AdminRegisterRequest": {
+      "AdminLoginRequest": {
         "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       }
     }
