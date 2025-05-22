@@ -6,5 +6,6 @@ namespace E_commerce_Admin_Dashboard.Interfaces
     public interface IAuthServices
     {
         Task<AdminLoginResponse?> AdminLoginAsync(LoginRequest req);
+        Task<CustomerLoginResponse?> CustomerLoginAsync(LoginRequest req);
     }
 }

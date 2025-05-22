@@ -19,6 +19,13 @@ namespace E_commerce_Admin_Dashboard.Repositories
                                  .FirstOrDefaultAsync(a => a.User.Email == email);
         }
 
+        public async Task<Customer?> GetCustomerByEmailAsync(string email)
+        {
+            return await _context.Customers
+                                .Include(a => a.User)
+                                .FirstOrDefaultAsync(a => a.User.Email == email);
+        }
+
         public async Task<User?> GetUserByEmailAsync(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);

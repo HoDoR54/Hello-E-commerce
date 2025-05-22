@@ -8,5 +8,7 @@ namespace E_commerce_Admin_Dashboard.Interfaces
         Task<Admin?> GetAdminByEmailAsync(string email);
 
         Task<User?> GetUserByEmailAsync(string email);
+
+        Task<Customer?> GetCustomerByEmailAsync(string email);
     }
 }
