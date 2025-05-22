@@ -5,16 +5,18 @@ namespace E_commerce_Admin_Dashboard.Mappers
 {
     public static class AdminMappers
     {
-        public static AdminLoginResponse ModelToLoginResponse (Admin model)
+        public static AdminLoginResponse ToAdminLoginResponse(User user, Admin admin)
         {
             return new AdminLoginResponse
             {
-                Id = model.Id,
-                Name = model.Name,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber,
-                IsSuperAdmin = model.IsSuperAdmin,
-                CreatedAt = model.CreatedAt,
+                UserId = user.Id,
+                Email = user.Email,
+
+                AdminId = admin.Id,
+                Name = admin.Name,
+                PhoneNumber = admin.PhoneNumber,
+                IsSuperAdmin = admin.IsSuperAdmin,
+                CreatedAt = admin.CreatedAt
             };
         }
     }

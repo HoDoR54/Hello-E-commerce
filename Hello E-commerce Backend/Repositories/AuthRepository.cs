@@ -1,6 +1,7 @@
 ﻿using E_commerce_Admin_Dashboard.Interfaces;
 using E_commerce_Admin_Dashboard.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace E_commerce_Admin_Dashboard.Repositories
 {
@@ -11,9 +12,16 @@ namespace E_commerce_Admin_Dashboard.Repositories
         {
             _context = context;
         }
-        public async Task<Admin> GetAdminByEmailAsync(string email)
+        public async Task<Admin?> GetAdminByEmailAsync(string email)
         {
-            return await _context.Admins.FirstOrDefaultAsync(x => x.Email == email);
+            return await _context.Admins
+                                 .Include(a => a.User)
+                                 .FirstOrDefaultAsync(a => a.User.Email == email);
+        }
+
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
         }
     }
 }
