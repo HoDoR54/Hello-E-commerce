@@ -9,7 +9,7 @@
     "Parameters": [
       {
         "Name": "req",
-        "Type": "E_commerce_Admin_Dashboard.DTO.Requests.AdminLoginRequest",
+        "Type": "E_commerce_Admin_Dashboard.DTO.Requests.LoginRequest",
         "IsRequired": true
       }
     ],

@@ -14,17 +14,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AdminLoginRequest"
+                "$ref": "#/components/schemas/LoginRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AdminLoginRequest"
+                "$ref": "#/components/schemas/LoginRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AdminLoginRequest"
+                "$ref": "#/components/schemas/LoginRequest"
               }
             }
           }
@@ -39,7 +39,7 @@
   },
   "components": {
     "schemas": {
-      "AdminLoginRequest": {
+      "LoginRequest": {
         "type": "object",
         "properties": {
           "email": {

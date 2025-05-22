@@ -5,6 +5,8 @@ namespace E_commerce_Admin_Dashboard.Interfaces
 {
     public interface IAuthRepository
     {
-        Task<Admin> GetAdminByEmailAsync(string email);
+        Task<Admin?> GetAdminByEmailAsync(string email);
+
+        Task<User?> GetUserByEmailAsync(string email);
     }
 }
