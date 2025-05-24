@@ -24,10 +24,6 @@ namespace E_commerce_Admin_Dashboard.Models
         [StringLength(20)]
         public string PhoneNumber { get; set; }
 
-        [Required]
-        [StringLength(255)]
-        public string Salt { get; set; }
-
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
