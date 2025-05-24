@@ -12,18 +12,18 @@ namespace E_commerce_Admin_Dashboard.Repositories
         {
             _context = context;
         }
-        public async Task<Admin?> GetAdminByEmailAsync(string email)
+        public async Task<Admin?> GetAdminByUserIdAsync(Guid Id)
         {
             return await _context.Admins
                                  .Include(a => a.User)
-                                 .FirstOrDefaultAsync(a => a.User.Email == email);
+                                 .FirstOrDefaultAsync(a => a.User.Id == Id);
         }
 
-        public async Task<Customer?> GetCustomerByEmailAsync(string email)
+        public async Task<Customer?> GetCustomerByUserIdAsync(Guid Id)
         {
             return await _context.Customers
                                 .Include(a => a.User)
-                                .FirstOrDefaultAsync(a => a.User.Email == email);
+                                .FirstOrDefaultAsync(a => a.User.Id == Id);
         }
 
         public async Task<User?> GetUserByEmailAsync(string email)

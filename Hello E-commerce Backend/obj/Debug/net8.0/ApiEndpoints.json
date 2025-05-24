@@ -2,7 +2,7 @@
   {
     "ContainingType": "E_commerce_Admin_Dashboard.Controllers.AuthController",
     "Method": "AdminLogin",
-    "RelativePath": "admin/login",
+    "RelativePath": "admins/login",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -26,6 +26,22 @@
       {
         "Name": "req",
         "Type": "E_commerce_Admin_Dashboard.DTO.Requests.LoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "E_commerce_Admin_Dashboard.Controllers.AuthController",
+    "Method": "CustomerRegister",
+    "RelativePath": "customers/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "req",
+        "Type": "E_commerce_Admin_Dashboard.DTO.Requests.CustomerRegisterRequest",
         "IsRequired": true
       }
     ],
