@@ -4,6 +4,7 @@ using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces;
 using E_commerce_Admin_Dashboard.Mappers;
 using E_commerce_Admin_Dashboard.Models;
+using System.Net;
 
 public class AuthServices : IAuthServices
 {
@@ -20,7 +21,7 @@ public class AuthServices : IAuthServices
         _customerRepo = customerRepo;
     }
 
-    public async Task<ServiceResult<AdminLoginResponse>?> AdminLoginAsync(LoginRequest req)
+    public async Task<ServiceResult<AdminLoginResponse>> AdminLoginAsync(LoginRequest req)
     {
         // verify credentials
         var matchedUser = await _authRepo.GetUserByEmailAsync(req.Email);
@@ -39,7 +40,7 @@ public class AuthServices : IAuthServices
         return ServiceResult<AdminLoginResponse>.Success(response, 200);
     }
 
-    public async Task<ServiceResult<CustomerLoginResponse>?> CustomerLoginAsync(LoginRequest req)
+    public async Task<ServiceResult<CustomerLoginResponse>> CustomerLoginAsync(LoginRequest req)
     {
         var matchedUser = await _authRepo.GetUserByEmailAsync(req.Email);
         if (matchedUser == null) return ServiceResult<CustomerLoginResponse>.Fail("The user with this email does not exists.", 404);
@@ -57,56 +58,41 @@ public class AuthServices : IAuthServices
         return ServiceResult<CustomerLoginResponse>.Success(response, 200);
     }
 
-    public async Task<ServiceResult<CustomerRegisterResponse>?> CustomerRegisterAsync(CustomerRegisterRequest req)
+    public async Task<ServiceResult<CustomerRegisterResponse>> CustomerRegisterAsync(CustomerRegisterRequest req)
     {
         var validationResult = _validationServices.ValidateCustomerRegistration(req);
         if (!validationResult.OK)
             return ServiceResult<CustomerRegisterResponse>.Fail(validationResult.ErrorMessage, validationResult.StatusCode);
 
         var mappedUser = CustomerMappers.CustomerRegisterToUserModel(req);
-        await _userRepo.AddNewUserAsync(mappedUser);
-
         var mappedCustomer = CustomerMappers.CustomerRegisterToCustomerModel(req, mappedUser);
+        var mappedAddress = CustomerMappers.CustomerAddressRegisterToModel(req.CustomerAddress);
+        var formattedAddress = _validationServices.ReformatAddress(mappedAddress);
+
+        var isAddressExisting = _customerRepo.AddressExists(formattedAddress);
+        var existingAddress = isAddressExisting
+            ? await _customerRepo.GetCustomerAddressByAddressAsync(formattedAddress)
+            : null;
+
+        await _userRepo.AddNewUserAsync(mappedUser);
         await _customerRepo.AddNewCustomerAsync(mappedCustomer);
 
-        var addressResult = await GetOrCreateCustomerAddressAsync(req.CustomerAddress, mappedCustomer);
-        if (!addressResult.OK)
-            return ServiceResult<CustomerRegisterResponse>.Fail(addressResult.ErrorMessage, addressResult.StatusCode);
+        if (!isAddressExisting)
+        {
+            await _customerRepo.AddNewCustomerAddressAsync(formattedAddress);
+            await _customerRepo.AddNewCustomerAddressDetailAsync(mappedCustomer, formattedAddress);
+        }
+        else
+        {
+            await _customerRepo.AddNewCustomerAddressDetailAsync(mappedCustomer, existingAddress);
+        }
 
-        var response = CustomerMappers.CustomerRegisterModelsToResponse(mappedUser, mappedCustomer, addressResult.Data);
-
+        var response = CustomerMappers.CustomerRegisterModelsToResponse(mappedUser, mappedCustomer, formattedAddress);
         return ServiceResult<CustomerRegisterResponse>.Success(response, 200);
     }
 
     public bool VerifyPassword(string password, string hashed)
     {
         return BCrypt.Net.BCrypt.Verify(password, hashed);
-    }
-
-    public async Task<ServiceResult<CustomerAddress>> GetOrCreateCustomerAddressAsync(CustomerAddressCreateRequest reqAddress, Customer customer)
-    {
-        CustomerAddress address;
-        CustomerAddressDetail detail;
-
-        bool addressExists = _customerRepo.AddressExists(reqAddress);
-
-        if (addressExists)
-        {
-            address = await _customerRepo.GetCustomerAddressByReqAsync(reqAddress);
-        }
-        else
-        {
-            address = await _customerRepo.AddNewCustomerAddressAsync(reqAddress);
-        }
-
-        if (address == null)
-            return ServiceResult<CustomerAddress>.Fail("Failed to find or create address.", 500);
-
-        detail = await _customerRepo.AddNewCustomerAddressDetailAsync(customer, address);
-
-        if (detail == null)
-            return ServiceResult<CustomerAddress>.Fail("Failed to add address detail.", 500);
-
-        return ServiceResult<CustomerAddress>.Success(address, 200);
     }
 }
