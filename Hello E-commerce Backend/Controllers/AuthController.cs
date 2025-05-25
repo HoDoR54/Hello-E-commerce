@@ -23,7 +23,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
             ServiceResult<AdminLoginResponse> response = await _authServices.AdminLoginAsync(req);
 
             if (!response.OK)
-                return BadRequest(response);
+                return StatusCode(response.StatusCode, response);
 
             return Ok(response);
         }
@@ -34,7 +34,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
             ServiceResult<CustomerLoginResponse> response = await _authServices.CustomerLoginAsync(req);
 
             if (!response.OK)
-                return BadRequest(response);
+                return StatusCode(response.StatusCode, response);
 
             return Ok(response);
         }
@@ -45,7 +45,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
             ServiceResult<CustomerRegisterResponse> response = await _authServices.CustomerRegisterAsync(req);
 
             if (!response.OK)
-                return BadRequest(response);
+                return StatusCode(response.StatusCode, response);
 
             return Ok(response);
         }
