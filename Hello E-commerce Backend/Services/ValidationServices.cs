@@ -1,6 +1,11 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Requests;
 using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces;
+using E_commerce_Admin_Dashboard.Mappers;
+using E_commerce_Admin_Dashboard.Models;
+using System.Globalization;
+using System.IO;
+using System.Security.Principal;
 
 public class ValidationServices : IValidationServices
 {
@@ -93,5 +98,53 @@ public class ValidationServices : IValidationServices
             return ServiceResult<string>.Fail("Invalid phone number format.", 400);
 
         return ServiceResult<string>.Success(phoneNumber, 200);
+    }
+
+    public CustomerAddress ReformatAddress(CustomerAddress address)
+    {
+        string streetLowered = address.Street.ToLower().Trim();
+        string streetFormatted = streetLowered;
+
+        if (streetLowered.EndsWith(".st"))
+        {
+            streetFormatted = streetLowered.Substring(0, streetLowered.Length - 3).Trim() + " Street";
+        }
+        else if (streetLowered.EndsWith(" st"))
+        {
+            streetFormatted = streetLowered.Substring(0, streetLowered.Length - 3).Trim() + " Street";
+        }
+        else if (streetLowered.EndsWith("street"))
+        {
+            streetFormatted = streetLowered.Substring(0, streetLowered.Length - 6).Trim() + " Street";
+        }
+        else if (streetLowered.EndsWith(" road"))
+        {
+            streetFormatted = streetLowered.Substring(0, streetLowered.Length - 5).Trim() + " Road";
+        }
+        else if (streetLowered.EndsWith(" rd."))
+        {
+            streetFormatted = streetLowered.Substring(0, streetLowered.Length - 4).Trim() + " Road";
+        }
+
+        streetFormatted = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(streetFormatted);
+
+        string cityLowered = address.City.ToLower().Trim();
+        string cityFormatted = cityLowered;
+
+        if (cityLowered.EndsWith(" city"))
+        {
+            cityFormatted = cityLowered.Substring(0, cityLowered.Length - 5).Trim();
+        }
+
+        cityFormatted = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cityFormatted);
+        string countryFormatted = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(address.Country);
+
+        return new CustomerAddress
+        {
+            Street = streetFormatted,
+            City = cityFormatted,
+            Country = countryFormatted,
+            PostalCode = address.PostalCode,
+        };
     }
 }

@@ -37,7 +37,7 @@ namespace E_commerce_Admin_Dashboard.Repositories
             return customer;
         }
 
-        public bool AddressExists(CustomerAddressCreateRequest address)
+        public bool AddressExists(CustomerAddress address)
         {
             return _context.CustomerAddresses.Any(a =>
                 a.Street == address.Street &&
@@ -46,7 +46,7 @@ namespace E_commerce_Admin_Dashboard.Repositories
                 a.PostalCode == address.PostalCode);
         }
 
-        public async Task<CustomerAddress?> GetCustomerAddressByReqAsync(CustomerAddressCreateRequest address)
+        public async Task<CustomerAddress?> GetCustomerAddressByAddressAsync(CustomerAddress address)
         {
             return await _context.CustomerAddresses.FirstOrDefaultAsync(a =>
                 a.Street == address.Street &&
@@ -55,13 +55,12 @@ namespace E_commerce_Admin_Dashboard.Repositories
                 a.PostalCode == address.PostalCode);
         }
 
-        public async Task<CustomerAddress> AddNewCustomerAddressAsync(CustomerAddressCreateRequest address)
+        public async Task<CustomerAddress> AddNewCustomerAddressAsync(CustomerAddress address)
         {
-            CustomerAddress newAddress = CustomerMappers.CustomerAddressRegisterToModel(address);
-            await _context.CustomerAddresses.AddAsync(newAddress);
+            await _context.CustomerAddresses.AddAsync(address);
             await _context.SaveChangesAsync();
 
-            return newAddress;
+            return address;
         }
     }
 }
