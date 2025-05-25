@@ -1,6 +1,5 @@
 using E_commerce_Admin_Dashboard.Interfaces;
 using E_commerce_Admin_Dashboard.Repositories;
-using E_commerce_Admin_Dashboard.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
