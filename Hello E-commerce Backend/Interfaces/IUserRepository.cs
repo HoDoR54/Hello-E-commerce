@@ -6,5 +6,7 @@ namespace E_commerce_Admin_Dashboard.Interfaces
     public interface IUserRepository
     {
         Task<User> AddNewUserAsync(User user);
+
+        Task<User?> GetUserByEmailAsync(string email);
     }
 }

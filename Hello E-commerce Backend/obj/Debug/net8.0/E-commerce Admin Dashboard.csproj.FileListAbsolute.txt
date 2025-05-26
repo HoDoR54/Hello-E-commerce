@@ -343,4 +343,11 @@ D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\obj\Debug\ne
 D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\obj\Debug\net8.0\E-commerce Admin Dashboard.genruntimeconfig.cache
 D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\obj\Debug\net8.0\ref\E-commerce Admin Dashboard.dll
 D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\bin\Debug\net8.0\BCrypt.Net-Next.dll
+D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\bin\Debug\net8.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\bin\Debug\net8.0\Microsoft.Extensions.Hosting.Abstractions.dll
+D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\bin\Debug\net8.0\Microsoft.Extensions.ObjectPool.dll
+D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\bin\Debug\net8.0\Microsoft.Extensions.WebEncoders.dll
+D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\bin\Debug\net8.0\System.Security.Cryptography.Xml.dll
+D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
 D:\Web Dev\Full Stack\Hello E-commerce\App\Hello E-commerce Backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

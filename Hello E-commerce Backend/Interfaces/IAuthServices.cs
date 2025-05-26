@@ -10,6 +10,7 @@ namespace E_commerce_Admin_Dashboard.Interfaces
         Task<ServiceResult<AdminLoginResponse>> AdminLoginAsync(LoginRequest req);
         Task<ServiceResult<CustomerLoginResponse>> CustomerLoginAsync(LoginRequest req);
         Task<ServiceResult<CustomerRegisterResponse>> CustomerRegisterAsync(CustomerRegisterRequest req);
+        Task<ServiceResult<TokenPair>> GetTokens(string email);
         bool VerifyPassword(string password, string hashed);
     }
 }

@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Admin> Admins { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<CustomerAddress> CustomerAddresses { get; set; }
     public DbSet<CustomerAddressDetail> CustomerAddressDetails { get; set; }
     public DbSet<Product> Products { get; set; }
@@ -96,6 +97,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Customer>()
             .Property(c => c.LoyaltyPoints)
             .HasDefaultValue(0);
+
+        modelBuilder.Entity<RefreshToken>()
+            .Property(rt => rt.IsRevoked)
+            .HasDefaultValue(false);
 
         modelBuilder.Entity<Product>()
             .Property(p => p.IsDeleted)
