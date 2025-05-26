@@ -1,3 +1,4 @@
+using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces;
 using E_commerce_Admin_Dashboard.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpContextAccessor();
+
 // Configure EF Core with connection string from appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -21,6 +24,9 @@ builder.Services.AddScoped<IAuthServices, AuthServices>();
 builder.Services.AddScoped<IValidationServices, ValidationServices>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<ICookiesHelper, CookiesHelper>();
+builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 
 var app = builder.Build();
 

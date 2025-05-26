@@ -2,6 +2,7 @@
 using E_commerce_Admin_Dashboard.Interfaces;
 using E_commerce_Admin_Dashboard.Mappers;
 using E_commerce_Admin_Dashboard.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace E_commerce_Admin_Dashboard.Repositories
 {
@@ -18,5 +19,11 @@ namespace E_commerce_Admin_Dashboard.Repositories
             await _context.SaveChangesAsync();
             return user;
         }
+
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+        }
+
     }
 }

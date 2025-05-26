@@ -5,6 +5,7 @@ using E_commerce_Admin_Dashboard.Interfaces;
 using E_commerce_Admin_Dashboard.Mappers;
 using E_commerce_Admin_Dashboard.Models;
 using System.Net;
+using System.Threading.Tasks;
 
 public class AuthServices : IAuthServices
 {
@@ -12,13 +13,15 @@ public class AuthServices : IAuthServices
     private readonly IUserRepository _userRepo;
     private readonly IValidationServices _validationServices;
     private readonly ICustomerRepository _customerRepo;
+    private readonly IJwtHelper _jwtHelper;
 
-    public AuthServices(IAuthRepository authRepo, IValidationServices validationServices, IUserRepository userRepo, ICustomerRepository customerRepo)
+    public AuthServices(IJwtHelper jwtHelper, IAuthRepository authRepo, IValidationServices validationServices, IUserRepository userRepo, ICustomerRepository customerRepo)
     {
         _userRepo = userRepo;
         _authRepo = authRepo;
         _validationServices = validationServices;
         _customerRepo = customerRepo;
+        _jwtHelper = jwtHelper;
     }
 
     public async Task<ServiceResult<AdminLoginResponse>> AdminLoginAsync(LoginRequest req)
@@ -36,6 +39,7 @@ public class AuthServices : IAuthServices
 
         // map the request to a login response and return
         AdminLoginResponse response = AdminMappers.ToAdminLoginResponse(matchedUser, matchedAdmin);
+
         // return success
         return ServiceResult<AdminLoginResponse>.Success(response, 200);
     }
@@ -90,6 +94,25 @@ public class AuthServices : IAuthServices
         var response = CustomerMappers.CustomerRegisterModelsToResponse(mappedUser, mappedCustomer, formattedAddress);
         return ServiceResult<CustomerRegisterResponse>.Success(response, 200);
     }
+
+    public async Task<ServiceResult<TokenPair>> GetTokens(string email)
+    {
+        var user = await _userRepo.GetUserByEmailAsync(email);
+        if (user == null)
+            return ServiceResult<TokenPair>.Fail("The user with this email does not exist.", 404);
+
+        var refreshToken = _jwtHelper.GenerateToken(user, TokenType.Refresh);
+        var accessToken = _jwtHelper.GenerateToken(user, TokenType.Access);
+
+        var tokens = new TokenPair
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
+        };
+
+        return ServiceResult<TokenPair>.Success(tokens, 200);
+    }
+
 
     public bool VerifyPassword(string password, string hashed)
     {
