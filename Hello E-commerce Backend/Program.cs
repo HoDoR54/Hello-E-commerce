@@ -1,5 +1,7 @@
 using E_commerce_Admin_Dashboard.Helpers;
-using E_commerce_Admin_Dashboard.Interfaces;
+using E_commerce_Admin_Dashboard.Interfaces.Helpers;
+using E_commerce_Admin_Dashboard.Interfaces.Repos;
+using E_commerce_Admin_Dashboard.Interfaces.Services;
 using E_commerce_Admin_Dashboard.Repositories;
 using Microsoft.EntityFrameworkCore;
 

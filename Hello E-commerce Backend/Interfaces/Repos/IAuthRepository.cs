@@ -1,7 +1,7 @@
 ﻿using E_commerce_Admin_Dashboard.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace E_commerce_Admin_Dashboard.Interfaces
+namespace E_commerce_Admin_Dashboard.Interfaces.Repos
 {
     public interface IAuthRepository
     {

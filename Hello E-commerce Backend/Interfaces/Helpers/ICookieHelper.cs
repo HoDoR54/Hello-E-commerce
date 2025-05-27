@@ -1,4 +1,4 @@
-﻿namespace E_commerce_Admin_Dashboard.Interfaces
+﻿namespace E_commerce_Admin_Dashboard.Interfaces.Helpers
 {
     public interface ICookiesHelper
     {

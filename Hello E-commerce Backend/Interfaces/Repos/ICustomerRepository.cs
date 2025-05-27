@@ -1,7 +1,7 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Requests;
 using E_commerce_Admin_Dashboard.Models;
 
-namespace E_commerce_Admin_Dashboard.Interfaces
+namespace E_commerce_Admin_Dashboard.Interfaces.Repos
 {
     public interface ICustomerRepository
     {

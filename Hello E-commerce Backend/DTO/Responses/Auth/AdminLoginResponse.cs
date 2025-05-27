@@ -1,4 +1,4 @@
-﻿namespace E_commerce_Admin_Dashboard.DTO.Responses
+﻿namespace E_commerce_Admin_Dashboard.DTO.Responses.Auth
 {
     public class AdminLoginResponse
     {

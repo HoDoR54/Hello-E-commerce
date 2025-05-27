@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("E-commerce Admin Dashboard")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6ed85a3f1c732cc5b7e5e07b5451ba56a40925a5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b8e6cc6761eba9d41fe977983c4a15f980606ca1")]
 [assembly: System.Reflection.AssemblyProductAttribute("E-commerce Admin Dashboard")]
 [assembly: System.Reflection.AssemblyTitleAttribute("E-commerce Admin Dashboard")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

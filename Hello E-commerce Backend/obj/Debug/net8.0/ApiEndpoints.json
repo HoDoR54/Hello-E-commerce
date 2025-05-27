@@ -2,14 +2,14 @@
   {
     "ContainingType": "E_commerce_Admin_Dashboard.Controllers.AuthController",
     "Method": "AdminLogin",
-    "RelativePath": "admins/login",
+    "RelativePath": "api/auth/admins/login",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "req",
-        "Type": "E_commerce_Admin_Dashboard.DTO.Requests.LoginRequest",
+        "Name": "request",
+        "Type": "E_commerce_Admin_Dashboard.DTO.Requests.Auth.LoginRequest",
         "IsRequired": true
       }
     ],
@@ -17,15 +17,25 @@
   },
   {
     "ContainingType": "E_commerce_Admin_Dashboard.Controllers.AuthController",
+    "Method": "AuthenticateToken",
+    "RelativePath": "api/auth/authenticate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "E_commerce_Admin_Dashboard.Controllers.AuthController",
     "Method": "CustomerLogin",
-    "RelativePath": "customers/login",
+    "RelativePath": "api/auth/customers/login",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "req",
-        "Type": "E_commerce_Admin_Dashboard.DTO.Requests.LoginRequest",
+        "Name": "request",
+        "Type": "E_commerce_Admin_Dashboard.DTO.Requests.Auth.LoginRequest",
         "IsRequired": true
       }
     ],
@@ -34,17 +44,27 @@
   {
     "ContainingType": "E_commerce_Admin_Dashboard.Controllers.AuthController",
     "Method": "CustomerRegister",
-    "RelativePath": "customers/register",
+    "RelativePath": "api/auth/customers/register",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "req",
-        "Type": "E_commerce_Admin_Dashboard.DTO.Requests.CustomerRegisterRequest",
+        "Name": "request",
+        "Type": "E_commerce_Admin_Dashboard.DTO.Requests.Auth.CustomerRegisterRequest",
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "E_commerce_Admin_Dashboard.Controllers.AuthController",
+    "Method": "RefreshAccessToken",
+    "RelativePath": "api/auth/refresh",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   }
 ]

@@ -1,4 +1,4 @@
-﻿namespace E_commerce_Admin_Dashboard.DTO.Requests
+﻿namespace E_commerce_Admin_Dashboard.DTO.Requests.Auth
 {
     public class CustomerAddressCreateRequest
     {

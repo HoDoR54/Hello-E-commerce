@@ -1,4 +1,4 @@
-﻿using E_commerce_Admin_Dashboard.Interfaces;
+﻿using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
