@@ -1,8 +1,8 @@
-﻿using E_commerce_Admin_Dashboard.DTO.Requests;
+﻿using E_commerce_Admin_Dashboard.DTO.Requests.Auth;
 using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Models;
 
-namespace E_commerce_Admin_Dashboard.Interfaces
+namespace E_commerce_Admin_Dashboard.Interfaces.Services
 {
     public interface IValidationServices
     {

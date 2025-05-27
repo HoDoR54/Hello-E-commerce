@@ -1,4 +1,4 @@
-﻿using E_commerce_Admin_Dashboard.Interfaces;
+﻿using E_commerce_Admin_Dashboard.Interfaces.Helpers;
 using Microsoft.Identity.Client;
 
 namespace E_commerce_Admin_Dashboard.Helpers

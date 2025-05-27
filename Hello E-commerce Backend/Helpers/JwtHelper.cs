@@ -1,5 +1,7 @@
-﻿using E_commerce_Admin_Dashboard.Interfaces;
+﻿using E_commerce_Admin_Dashboard.Interfaces.Helpers;
+using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Models;
+using E_commerce_Admin_Dashboard.Repositories;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,6 +9,7 @@ using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Security.Cryptography.Xml;
 using System.Text;
+using System.Xml.Schema;
 
 namespace E_commerce_Admin_Dashboard.Helpers
 {
@@ -18,9 +21,12 @@ namespace E_commerce_Admin_Dashboard.Helpers
     public class JwtHelper : IJwtHelper
     {
         private readonly IConfiguration _configuration;
-        public JwtHelper (IConfiguration configuration)
+        private readonly JwtSecurityTokenHandler _jwtHandler = new JwtSecurityTokenHandler();
+        private readonly IUserRepository _userRepo;
+        public JwtHelper (IConfiguration configuration, IUserRepository userRepository)
         {
             _configuration = configuration;
+            _userRepo = userRepository;
         }
 
         public string GetSecretKey ()
@@ -48,6 +54,34 @@ namespace E_commerce_Admin_Dashboard.Helpers
                 );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task<ServiceResult<string>> ValidateTokenAsync(string token, TokenType tokenType)
+        {
+            string typeOfToken = tokenType.ToString().ToLower();
+
+            if (!_jwtHandler.CanReadToken(token))
+            {
+                return ServiceResult<string>.Fail($"Unreadable {typeOfToken} token.", 400);
+            }
+
+            var jwt = _jwtHandler.ReadJwtToken(token);
+
+            if (DateTime.UtcNow > jwt.ValidTo)
+            {
+                return ServiceResult<string>.Fail($"Expired {typeOfToken} token.", 401);
+            }
+
+            if (tokenType == TokenType.Refresh)
+            {
+                var matchedToken = await _userRepo.GetRefreshTokenAsync(token);
+                if (matchedToken == null)
+                {
+                    return ServiceResult<string>.Fail("Invalid refresh token.", 401);
+                }
+            }
+
+            return ServiceResult<string>.Success(token, 200);
         }
     }
 }

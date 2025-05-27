@@ -1,5 +1,5 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Responses;
-using E_commerce_Admin_Dashboard.Interfaces;
+using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Mappers;
 using E_commerce_Admin_Dashboard.Models;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +18,11 @@ namespace E_commerce_Admin_Dashboard.Repositories
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
             return user;
+        }
+
+        public async Task<RefreshToken?> GetRefreshTokenAsync(string refreshToken)
+        {
+            return await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken);
         }
 
         public async Task<User?> GetUserByEmailAsync(string email)

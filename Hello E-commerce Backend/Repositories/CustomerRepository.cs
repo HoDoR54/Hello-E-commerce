@@ -1,5 +1,5 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Requests;
-using E_commerce_Admin_Dashboard.Interfaces;
+using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Mappers;
 using E_commerce_Admin_Dashboard.Models;
 using Microsoft.EntityFrameworkCore;

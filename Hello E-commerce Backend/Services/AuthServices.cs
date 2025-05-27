@@ -1,121 +1,155 @@
-﻿using E_commerce_Admin_Dashboard.DTO.Requests;
-using E_commerce_Admin_Dashboard.DTO.Responses;
+﻿using E_commerce_Admin_Dashboard.DTO.Requests.Auth;
+using E_commerce_Admin_Dashboard.DTO.Responses.Auth;
 using E_commerce_Admin_Dashboard.Helpers;
-using E_commerce_Admin_Dashboard.Interfaces;
+using E_commerce_Admin_Dashboard.Interfaces.Helpers;
+using E_commerce_Admin_Dashboard.Interfaces.Repos;
+using E_commerce_Admin_Dashboard.Interfaces.Services;
 using E_commerce_Admin_Dashboard.Mappers;
 using E_commerce_Admin_Dashboard.Models;
-using System.Net;
-using System.Threading.Tasks;
 
 public class AuthServices : IAuthServices
 {
-    private readonly IAuthRepository _authRepo;
-    private readonly IUserRepository _userRepo;
-    private readonly IValidationServices _validationServices;
-    private readonly ICustomerRepository _customerRepo;
+    private readonly IAuthRepository _authRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly IValidationServices _validator;
+    private readonly ICustomerRepository _customerRepository;
     private readonly IJwtHelper _jwtHelper;
 
-    public AuthServices(IJwtHelper jwtHelper, IAuthRepository authRepo, IValidationServices validationServices, IUserRepository userRepo, ICustomerRepository customerRepo)
+    public AuthServices(IJwtHelper jwtHelper, IAuthRepository authRepository, IValidationServices validator, IUserRepository userRepository, ICustomerRepository customerRepository)
     {
-        _userRepo = userRepo;
-        _authRepo = authRepo;
-        _validationServices = validationServices;
-        _customerRepo = customerRepo;
+        _userRepository = userRepository;
+        _authRepository = authRepository;
+        _validator = validator;
+        _customerRepository = customerRepository;
         _jwtHelper = jwtHelper;
     }
 
-    public async Task<ServiceResult<AdminLoginResponse>> AdminLoginAsync(LoginRequest req)
+    public async Task<ServiceResult<AdminLoginResponse>> LoginAsAdminAsync(LoginRequest request)
     {
-        // verify credentials
-        var matchedUser = await _authRepo.GetUserByEmailAsync(req.Email);
-        if (matchedUser == null) return ServiceResult<AdminLoginResponse>.Fail("The user with this email does not exists.", 404);
+        var user = await _authRepository.GetUserByEmailAsync(request.Email);
+        if (user == null) return ServiceResult<AdminLoginResponse>.Fail("User not found.", 404);
 
-        var matchedAdmin = await _authRepo.GetAdminByUserIdAsync(matchedUser.Id);
-        if (matchedAdmin == null) return ServiceResult<AdminLoginResponse>.Fail("This user is not an admin.", 404);
+        var admin = await _authRepository.GetAdminByUserIdAsync(user.Id);
+        if (admin == null) return ServiceResult<AdminLoginResponse>.Fail("User is not an admin.", 404);
 
-        string? hashed = matchedUser.Password;
-        if (!VerifyPassword(req.Password, hashed))
-            return ServiceResult<AdminLoginResponse>.Fail("The inputted password is wrong.", 401);
+        if (!IsPasswordValid(request.Password, user.Password))
+            return ServiceResult<AdminLoginResponse>.Fail("Incorrect password.", 401);
 
-        // map the request to a login response and return
-        AdminLoginResponse response = AdminMappers.ToAdminLoginResponse(matchedUser, matchedAdmin);
-
-        // return success
+        var response = AdminMappers.ToAdminLoginResponse(user, admin);
         return ServiceResult<AdminLoginResponse>.Success(response, 200);
     }
 
-    public async Task<ServiceResult<CustomerLoginResponse>> CustomerLoginAsync(LoginRequest req)
+    public async Task<ServiceResult<CustomerLoginResponse>> LoginAsCustomerAsync(LoginRequest request)
     {
-        var matchedUser = await _authRepo.GetUserByEmailAsync(req.Email);
-        if (matchedUser == null) return ServiceResult<CustomerLoginResponse>.Fail("The user with this email does not exists.", 404);
+        var user = await _authRepository.GetUserByEmailAsync(request.Email);
+        if (user == null) return ServiceResult<CustomerLoginResponse>.Fail("User not found.", 404);
 
-        var matchedCustomer = await _authRepo.GetCustomerByUserIdAsync(matchedUser.Id);
-        if (matchedCustomer == null) return ServiceResult<CustomerLoginResponse>.Fail("This user is not likely to be an admin.", 404);
+        var customer = await _authRepository.GetCustomerByUserIdAsync(user.Id);
+        if (customer == null) return ServiceResult<CustomerLoginResponse>.Fail("User is not a customer.", 404);
 
-        string hashed = matchedUser.Password;
-        if (!VerifyPassword(req.Password, hashed))
-            return ServiceResult<CustomerLoginResponse>.Fail("The inputted password is wrong.", 401);
+        if (!IsPasswordValid(request.Password, user.Password))
+            return ServiceResult<CustomerLoginResponse>.Fail("Incorrect password.", 401);
 
-
-        // map and return success
-        CustomerLoginResponse response = CustomerMappers.ToCustomerLoginResponse(matchedUser, matchedCustomer);
+        var response = CustomerMappers.ToCustomerLoginResponse(user, customer);
         return ServiceResult<CustomerLoginResponse>.Success(response, 200);
     }
 
-    public async Task<ServiceResult<CustomerRegisterResponse>> CustomerRegisterAsync(CustomerRegisterRequest req)
+    public async Task<ServiceResult<CustomerRegisterResponse>> RegisterCustomerAsync(CustomerRegisterRequest request)
     {
-        var validationResult = _validationServices.ValidateCustomerRegistration(req);
-        if (!validationResult.OK)
-            return ServiceResult<CustomerRegisterResponse>.Fail(validationResult.ErrorMessage, validationResult.StatusCode);
+        var validation = _validator.ValidateCustomerRegistration(request);
+        if (!validation.OK)
+            return ServiceResult<CustomerRegisterResponse>.Fail(validation.ErrorMessage, validation.StatusCode);
 
-        var mappedUser = CustomerMappers.CustomerRegisterToUserModel(req);
-        var mappedCustomer = CustomerMappers.CustomerRegisterToCustomerModel(req, mappedUser);
-        var mappedAddress = CustomerMappers.CustomerAddressRegisterToModel(req.CustomerAddress);
-        var formattedAddress = _validationServices.ReformatAddress(mappedAddress);
+        var newUser = CustomerMappers.CustomerRegisterToUserModel(request);
+        var newCustomer = CustomerMappers.CustomerRegisterToCustomerModel(request, newUser);
+        var newAddress = CustomerMappers.CustomerAddressRegisterToModel(request.CustomerAddress);
+        var formattedAddress = _validator.ReformatAddress(newAddress);
 
-        var isAddressExisting = _customerRepo.AddressExists(formattedAddress);
-        var existingAddress = isAddressExisting
-            ? await _customerRepo.GetCustomerAddressByAddressAsync(formattedAddress)
+        var addressExists = _customerRepository.AddressExists(formattedAddress);
+        var existingAddress = addressExists
+            ? await _customerRepository.GetCustomerAddressByAddressAsync(formattedAddress)
             : null;
 
-        await _userRepo.AddNewUserAsync(mappedUser);
-        await _customerRepo.AddNewCustomerAsync(mappedCustomer);
+        await _userRepository.AddNewUserAsync(newUser);
+        await _customerRepository.AddNewCustomerAsync(newCustomer);
 
-        if (!isAddressExisting)
+        if (!addressExists)
         {
-            await _customerRepo.AddNewCustomerAddressAsync(formattedAddress);
-            await _customerRepo.AddNewCustomerAddressDetailAsync(mappedCustomer, formattedAddress);
+            await _customerRepository.AddNewCustomerAddressAsync(formattedAddress);
+            await _customerRepository.AddNewCustomerAddressDetailAsync(newCustomer, formattedAddress);
         }
         else
         {
-            await _customerRepo.AddNewCustomerAddressDetailAsync(mappedCustomer, existingAddress);
+            await _customerRepository.AddNewCustomerAddressDetailAsync(newCustomer, existingAddress);
         }
 
-        var response = CustomerMappers.CustomerRegisterModelsToResponse(mappedUser, mappedCustomer, formattedAddress);
+        var response = CustomerMappers.CustomerRegisterModelsToResponse(newUser, newCustomer, formattedAddress);
         return ServiceResult<CustomerRegisterResponse>.Success(response, 200);
     }
 
-    public async Task<ServiceResult<TokenPair>> GetTokens(string email)
+    public async Task<ServiceResult<string>> GenerateTokenAsync(string? email, TokenType type, string? refreshToken)
     {
-        var user = await _userRepo.GetUserByEmailAsync(email);
-        if (user == null)
-            return ServiceResult<TokenPair>.Fail("The user with this email does not exist.", 404);
+        if (string.IsNullOrEmpty(email))
+            return ServiceResult<string>.Fail("Email is required.", 400);
 
-        var refreshToken = _jwtHelper.GenerateToken(user, TokenType.Refresh);
-        var accessToken = _jwtHelper.GenerateToken(user, TokenType.Access);
+        var userResult = await GetUserByEmailAsync(email);
+        if (!userResult.OK)
+            return ServiceResult<string>.Fail(userResult.ErrorMessage, userResult.StatusCode);
 
-        var tokens = new TokenPair
-        {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken
-        };
-
-        return ServiceResult<TokenPair>.Success(tokens, 200);
+        var token = _jwtHelper.GenerateToken(userResult.Data, type);
+        return ServiceResult<string>.Success(token, 200);
     }
 
-
-    public bool VerifyPassword(string password, string hashed)
+    public async Task<ServiceResult<string>> RefreshAccessToken (string refreshToken)
     {
-        return BCrypt.Net.BCrypt.Verify(password, hashed);
+        var refreshResult = await _jwtHelper.ValidateTokenAsync(refreshToken, TokenType.Refresh);
+        if (!refreshResult.OK)
+            return ServiceResult<string>.Fail(refreshResult.ErrorMessage, refreshResult.StatusCode);
+        
+        RefreshToken matchedToken = await _userRepository.GetRefreshTokenAsync(refreshToken);
+        string email = matchedToken.User.Email;
+        var newAccessToken = await GenerateTokenAsync(email, TokenType.Access, refreshToken);
+        if (!newAccessToken.OK) 
+            return ServiceResult<string>.Fail(newAccessToken.ErrorMessage, newAccessToken.StatusCode);
+
+        return ServiceResult<string>.Success(newAccessToken.Data, 200);
+    }
+
+    public async Task<ServiceResult<TokenPair>> GenerateTokenPairAsync(string email)
+    {
+        var refreshResult = await GenerateTokenAsync(email, TokenType.Refresh, null);
+        if (!refreshResult.OK) return ServiceResult<TokenPair>.Fail(refreshResult.ErrorMessage, refreshResult.StatusCode);
+
+        var accessResult = await GenerateTokenAsync(email, TokenType.Access, null);
+        if (!accessResult.OK) return ServiceResult<TokenPair>.Fail(accessResult.ErrorMessage, accessResult.StatusCode);
+
+        var tokenPair = new TokenPair
+        {
+            AccessToken = accessResult.Data,
+            RefreshToken = refreshResult.Data
+        };
+
+        return ServiceResult<TokenPair>.Success(tokenPair, 200);
+    }
+
+    public async Task<ServiceResult<string>> ValidateTokenAsync(string token, TokenType type)
+    {
+        var result = await _jwtHelper.ValidateTokenAsync(token, type);
+        return result.OK
+            ? ServiceResult<string>.Success(token, 200)
+            : ServiceResult<string>.Fail(result.ErrorMessage, result.StatusCode);
+    }
+
+    public bool IsPasswordValid(string inputPassword, string hashedPassword)
+    {
+        return BCrypt.Net.BCrypt.Verify(inputPassword, hashedPassword);
+    }
+
+    public async Task<ServiceResult<User>> GetUserByEmailAsync(string email)
+    {
+        var user = await _userRepository.GetUserByEmailAsync(email);
+        return user == null
+            ? ServiceResult<User>.Fail("User not found.", 404)
+            : ServiceResult<User>.Success(user, 200);
     }
 }

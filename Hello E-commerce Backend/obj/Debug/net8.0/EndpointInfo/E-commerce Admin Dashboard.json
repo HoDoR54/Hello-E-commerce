@@ -5,7 +5,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/admins/login": {
+    "/api/auth/admins/login": {
       "post": {
         "tags": [
           "Auth"
@@ -36,7 +36,7 @@
         }
       }
     },
-    "/customers/login": {
+    "/api/auth/customers/login": {
       "post": {
         "tags": [
           "Auth"
@@ -67,7 +67,7 @@
         }
       }
     },
-    "/customers/register": {
+    "/api/auth/customers/register": {
       "post": {
         "tags": [
           "Auth"
@@ -91,6 +91,30 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/authenticate": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
         "responses": {
           "200": {
             "description": "OK"
