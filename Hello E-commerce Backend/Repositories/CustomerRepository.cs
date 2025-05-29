@@ -37,14 +37,15 @@ namespace E_commerce_Admin_Dashboard.Repositories
             return customer;
         }
 
-        public bool AddressExists(CustomerAddress address)
+        public async Task<bool> AddressExistsAsync(CustomerAddress address)
         {
-            return _context.CustomerAddresses.Any(a =>
+            return await _context.CustomerAddresses.AnyAsync(a =>
                 a.Street == address.Street &&
                 a.City == address.City &&
                 a.Country == address.Country &&
                 a.PostalCode == address.PostalCode);
         }
+
 
         public async Task<CustomerAddress?> GetCustomerAddressByAddressAsync(CustomerAddress address)
         {

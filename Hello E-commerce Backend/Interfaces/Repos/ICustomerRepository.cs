@@ -9,7 +9,7 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Repos
 
         Task<CustomerAddressDetail> AddNewCustomerAddressDetailAsync(Customer customer, CustomerAddress address);
 
-        bool AddressExists(CustomerAddress address);
+        Task<bool> AddressExistsAsync(CustomerAddress address);
 
         Task<CustomerAddress> GetCustomerAddressByAddressAsync(CustomerAddress address);
 
