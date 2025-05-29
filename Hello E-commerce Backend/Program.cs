@@ -32,7 +32,10 @@ builder.Services.AddScoped<ICookiesHelper, CookiesHelper>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddScoped<ICustomerMapper, CustomerMapper>();
+<<<<<<< HEAD
 builder.Services.AddScoped<IAdminMapper, AdminMapper>();
+=======
+>>>>>>> 69be6c4b48a3c81811b641bbfaca998ee6a5a41f
 
 var app = builder.Build();
 
