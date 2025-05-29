@@ -2,6 +2,7 @@
 using E_commerce_Admin_Dashboard.DTO.Responses.Auth;
 using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Helpers;
+using E_commerce_Admin_Dashboard.Interfaces.Mappers;
 using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Interfaces.Services;
 using E_commerce_Admin_Dashboard.Mappers;
@@ -14,14 +15,28 @@ public class AuthServices : IAuthServices
     private readonly IValidationServices _validator;
     private readonly ICustomerRepository _customerRepository;
     private readonly IJwtHelper _jwtHelper;
+    private readonly IPasswordHasher _passwordHasher;
+    private readonly IAdminMapper _adminMapper;
+    private readonly ICustomerMapper _customerMapper;
 
-    public AuthServices(IJwtHelper jwtHelper, IAuthRepository authRepository, IValidationServices validator, IUserRepository userRepository, ICustomerRepository customerRepository)
+    public AuthServices(
+    IJwtHelper jwtHelper,
+    IAuthRepository authRepository,
+    IValidationServices validator,
+    IUserRepository userRepository,
+    ICustomerRepository customerRepository,
+    IPasswordHasher passwordHasher,
+    ICustomerMapper customerMapper,
+    IAdminMapper adminMapper)
     {
         _userRepository = userRepository;
         _authRepository = authRepository;
         _validator = validator;
         _customerRepository = customerRepository;
         _jwtHelper = jwtHelper;
+        _passwordHasher = passwordHasher;
+        _customerMapper = customerMapper;
+        _adminMapper = adminMapper;
     }
 
     public async Task<ServiceResult<AdminLoginResponse>> LoginAsAdminAsync(LoginRequest request)
@@ -32,10 +47,10 @@ public class AuthServices : IAuthServices
         var admin = await _authRepository.GetAdminByUserIdAsync(user.Id);
         if (admin == null) return ServiceResult<AdminLoginResponse>.Fail("User is not an admin.", 404);
 
-        if (!IsPasswordValid(request.Password, user.Password))
+        if (!_passwordHasher.Verify(request.Password, user.Password))
             return ServiceResult<AdminLoginResponse>.Fail("Incorrect password.", 401);
 
-        var response = AdminMappers.ToAdminLoginResponse(user, admin);
+        var response = _adminMapper.ToAdminLoginResponse(user, admin);
         return ServiceResult<AdminLoginResponse>.Success(response, 200);
     }
 
@@ -47,10 +62,10 @@ public class AuthServices : IAuthServices
         var customer = await _authRepository.GetCustomerByUserIdAsync(user.Id);
         if (customer == null) return ServiceResult<CustomerLoginResponse>.Fail("User is not a customer.", 404);
 
-        if (!IsPasswordValid(request.Password, user.Password))
+        if (!_passwordHasher.Verify(request.Password, user.Password))
             return ServiceResult<CustomerLoginResponse>.Fail("Incorrect password.", 401);
 
-        var response = CustomerMappers.ToCustomerLoginResponse(user, customer);
+        var response = _customerMapper.ToCustomerLoginResponse(user, customer);
         return ServiceResult<CustomerLoginResponse>.Success(response, 200);
     }
 
@@ -60,12 +75,12 @@ public class AuthServices : IAuthServices
         if (!validation.OK)
             return ServiceResult<CustomerRegisterResponse>.Fail(validation.ErrorMessage, validation.StatusCode);
 
-        var newUser = CustomerMappers.CustomerRegisterToUserModel(request);
-        var newCustomer = CustomerMappers.CustomerRegisterToCustomerModel(request, newUser);
-        var newAddress = CustomerMappers.CustomerAddressRegisterToModel(request.CustomerAddress);
+        var newUser = _customerMapper.CustomerRegisterToUserModel(request);
+        var newCustomer = _customerMapper.CustomerRegisterToCustomerModel(request, newUser);
+        var newAddress = _customerMapper.CustomerAddressRegisterToModel(request.CustomerAddress);
         var formattedAddress = _validator.ReformatAddress(newAddress);
 
-        var addressExists = _customerRepository.AddressExists(formattedAddress);
+        var addressExists = await _customerRepository.AddressExistsAsync(formattedAddress);
         var existingAddress = addressExists
             ? await _customerRepository.GetCustomerAddressByAddressAsync(formattedAddress)
             : null;
@@ -83,7 +98,7 @@ public class AuthServices : IAuthServices
             await _customerRepository.AddNewCustomerAddressDetailAsync(newCustomer, existingAddress);
         }
 
-        var response = CustomerMappers.CustomerRegisterModelsToResponse(newUser, newCustomer, formattedAddress);
+        var response = _customerMapper.CustomerRegisterModelsToResponse(newUser, newCustomer, formattedAddress);
         return ServiceResult<CustomerRegisterResponse>.Success(response, 200);
     }
 
@@ -138,11 +153,6 @@ public class AuthServices : IAuthServices
         return result.OK
             ? ServiceResult<string>.Success(token, 200)
             : ServiceResult<string>.Fail(result.ErrorMessage, result.StatusCode);
-    }
-
-    public bool IsPasswordValid(string inputPassword, string hashedPassword)
-    {
-        return BCrypt.Net.BCrypt.Verify(inputPassword, hashedPassword);
     }
 
     public async Task<ServiceResult<User>> GetUserByEmailAsync(string email)
