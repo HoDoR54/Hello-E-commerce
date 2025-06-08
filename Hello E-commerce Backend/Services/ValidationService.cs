@@ -1,5 +1,6 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Requests.Auth;
 using E_commerce_Admin_Dashboard.Helpers;
+using E_commerce_Admin_Dashboard.Interfaces.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Services;
 using E_commerce_Admin_Dashboard.Mappers;
 using E_commerce_Admin_Dashboard.Models;
@@ -9,8 +10,13 @@ using System.Security.Principal;
 
 namespace Services
 {
-    public class ValidationServices : IValidationServices
+    public class ValidationService : IValidationService
     {
+        private readonly IJwtHelper _jwtHelper;
+        public ValidationService(IJwtHelper jwtHelper)
+        {
+            _jwtHelper = jwtHelper;
+        }
         public ServiceResult<CustomerRegisterRequest> ValidateCustomerRegistration(CustomerRegisterRequest req)
         {
             var result = ValidateEmail(req.Email);
@@ -148,6 +154,17 @@ namespace Services
                 Country = countryFormatted,
                 PostalCode = address.PostalCode,
             };
+        }
+
+        public async Task<ServiceResult<bool>> ValidateSuperAdminRole(string token)
+        {
+            var validationResult = await _jwtHelper.ValidateTokenAsync(token, TokenType.Access);
+            if (!validationResult.OK) return ServiceResult<bool>.Fail(validationResult.ErrorMessage, validationResult.StatusCode);
+
+            var roleCheckingResult = await _jwtHelper.IsSuperAdmin(validationResult.Data);
+            if (!roleCheckingResult.OK) return ServiceResult<bool>.Fail(roleCheckingResult.ErrorMessage, roleCheckingResult.StatusCode);
+
+            return ServiceResult<bool>.Success(roleCheckingResult.Data, 200);
         }
     }
 

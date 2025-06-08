@@ -23,10 +23,12 @@ namespace E_commerce_Admin_Dashboard.Helpers
         private readonly IConfiguration _configuration;
         private readonly JwtSecurityTokenHandler _jwtHandler = new JwtSecurityTokenHandler();
         private readonly IUserRepository _userRepo;
-        public JwtHelper (IConfiguration configuration, IUserRepository userRepository)
+        private readonly IAdminRepository _adminRepo;
+        public JwtHelper (IConfiguration configuration, IUserRepository userRepository, IAdminRepository adminRepo)
         {
             _configuration = configuration;
             _userRepo = userRepository;
+            _adminRepo = adminRepo;
         }
 
         public string GetSecretKey ()
@@ -82,6 +84,22 @@ namespace E_commerce_Admin_Dashboard.Helpers
             }
 
             return ServiceResult<string>.Success(token, 200);
+        }
+
+        public async Task<ServiceResult<bool>> IsSuperAdmin(string token)
+        {
+            var jwt = _jwtHandler.ReadJwtToken(token);
+            var role = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (role != UserRole.Admin.ToString()) return ServiceResult<bool>.Fail("User not an admin.", 401);
+
+            var email = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            if (email == null) return ServiceResult<bool>.Fail("No email in the token.", 400);
+            var matchedUser = await _userRepo.GetUserByEmailAsync(email);
+            if (matchedUser == null) return ServiceResult<bool>.Fail("No user found.", 404);
+            var matchedAdmin = await _adminRepo.GetAdminByUserIdAsync(matchedUser.Id);
+            if (matchedAdmin == null) return ServiceResult<bool>.Fail("No admin record found.", 404);
+
+            return ServiceResult<bool>.Success(matchedAdmin.IsSuperAdmin, 200);
         }
     }
 }

@@ -4,7 +4,7 @@ using E_commerce_Admin_Dashboard.Models;
 
 namespace E_commerce_Admin_Dashboard.Interfaces.Services
 {
-    public interface IValidationServices
+    public interface IValidationService
     {
         ServiceResult<CustomerRegisterRequest> ValidateCustomerRegistration(CustomerRegisterRequest req);
         ServiceResult<string> ValidateEmail(string email);
@@ -12,5 +12,7 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Services
         ServiceResult<string> ValidatePhoneNumber(string phoneNumber);
         ServiceResult<CustomerAddressCreateRequest> ValidateAddress(CustomerAddressCreateRequest address);
         CustomerAddress ReformatAddress(CustomerAddress address);
+
+        Task<ServiceResult<bool>> ValidateSuperAdminRole(string token);
     }
 }

@@ -30,5 +30,9 @@ namespace E_commerce_Admin_Dashboard.Repositories
             return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
         }
 
+        public async Task<User?> GetUserByIdAsync(Guid id)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        }
     }
 }

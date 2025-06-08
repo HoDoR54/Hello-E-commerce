@@ -5,6 +5,7 @@ using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Interfaces.Services;
 using E_commerce_Admin_Dashboard.Mappers;
 using E_commerce_Admin_Dashboard.Repositories;
+using E_commerce_Admin_Dashboard.Services;
 using Microsoft.EntityFrameworkCore;
 using Services;
 
@@ -25,13 +26,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Confiigure Default Classes for Interfaces
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<IAuthServices, AuthServices>();
-builder.Services.AddScoped<IValidationServices, ValidationServices>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IValidationService, ValidationService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+
 builder.Services.AddScoped<ICookiesHelper, CookiesHelper>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+
 builder.Services.AddScoped<ICustomerMapper, CustomerMapper>();
 builder.Services.AddScoped<IAdminMapper, AdminMapper>();
 

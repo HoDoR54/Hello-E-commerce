@@ -9,5 +9,7 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Helpers
         string GenerateToken(User user, TokenType tokenType);
 
         Task<ServiceResult<string>> ValidateTokenAsync (string token, TokenType tokenType);
+
+        Task<ServiceResult<bool>> IsSuperAdmin(string token);
     }
 }

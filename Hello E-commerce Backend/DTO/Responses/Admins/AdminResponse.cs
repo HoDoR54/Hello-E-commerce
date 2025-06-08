@@ -1,6 +1,6 @@
-﻿namespace E_commerce_Admin_Dashboard.DTO.Responses.Auth
+﻿namespace E_commerce_Admin_Dashboard.DTO.Responses.Admins
 {
-    public class AdminLoginResponse
+    public class AdminResponse
     {
         public Guid UserId { get; set; }
         public string Email { get; set; }
