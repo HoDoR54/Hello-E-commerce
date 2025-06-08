@@ -1,4 +1,5 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Requests.Auth;
+using E_commerce_Admin_Dashboard.DTO.Responses.Admins;
 using E_commerce_Admin_Dashboard.DTO.Responses.Auth;
 using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Helpers;
@@ -10,21 +11,21 @@ using E_commerce_Admin_Dashboard.Models;
 
 namespace Services
 {
-    public class AuthServices : IAuthServices
+    public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IValidationServices _validator;
+        private readonly IValidationService _validator;
         private readonly ICustomerRepository _customerRepository;
         private readonly IJwtHelper _jwtHelper;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IAdminMapper _adminMapper;
         private readonly ICustomerMapper _customerMapper;
 
-        public AuthServices(
+        public AuthService(
         IJwtHelper jwtHelper,
         IAuthRepository authRepository,
-        IValidationServices validator,
+        IValidationService validator,
         IUserRepository userRepository,
         ICustomerRepository customerRepository,
         IPasswordHasher passwordHasher,
@@ -41,19 +42,19 @@ namespace Services
             _adminMapper = adminMapper;
         }
 
-        public async Task<ServiceResult<AdminLoginResponse>> LoginAsAdminAsync(LoginRequest request)
+        public async Task<ServiceResult<AdminResponse>> LoginAsAdminAsync(LoginRequest request)
         {
             var user = await _authRepository.GetUserByEmailAsync(request.Email);
-            if (user == null) return ServiceResult<AdminLoginResponse>.Fail("User not found.", 404);
+            if (user == null) return ServiceResult<AdminResponse>.Fail("User not found.", 404);
 
             var admin = await _authRepository.GetAdminByUserIdAsync(user.Id);
-            if (admin == null) return ServiceResult<AdminLoginResponse>.Fail("User is not an admin.", 404);
+            if (admin == null) return ServiceResult<AdminResponse>.Fail("User is not an admin.", 404);
 
             if (!_passwordHasher.Verify(request.Password, user.Password))
-                return ServiceResult<AdminLoginResponse>.Fail("Incorrect password.", 401);
+                return ServiceResult<AdminResponse>.Fail("Incorrect password.", 401);
 
             var response = _adminMapper.ToAdminLoginResponse(user, admin);
-            return ServiceResult<AdminLoginResponse>.Success(response, 200);
+            return ServiceResult<AdminResponse>.Success(response, 200);
         }
 
         public async Task<ServiceResult<CustomerLoginResponse>> LoginAsCustomerAsync(LoginRequest request)

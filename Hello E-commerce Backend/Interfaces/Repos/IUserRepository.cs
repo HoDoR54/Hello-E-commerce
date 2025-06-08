@@ -10,5 +10,6 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Repos
         Task<User?> GetUserByEmailAsync(string email);
 
         Task<RefreshToken?> GetRefreshTokenAsync(string refreshToken);
+        Task<User?> GetUserByIdAsync(Guid id);
     }
 }

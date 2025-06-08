@@ -13,10 +13,10 @@ namespace E_commerce_Admin_Dashboard.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthServices _authServices;
+        private readonly IAuthService _authServices;
         private readonly ICookiesHelper _cookiesHelper;
 
-        public AuthController(IAuthServices authServices, ICookiesHelper cookiesHelper)
+        public AuthController(IAuthService authServices, ICookiesHelper cookiesHelper)
         {
             _authServices = authServices;
             _cookiesHelper = cookiesHelper;
