@@ -1,6 +1,8 @@
-﻿using E_commerce_Admin_Dashboard.DTO.Requests.Auth;
+﻿using E_commerce_Admin_Dashboard.DTO.Requests.Admins;
+using E_commerce_Admin_Dashboard.DTO.Requests.Auth;
 using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Helpers;
+using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Interfaces.Services;
 using E_commerce_Admin_Dashboard.Mappers;
 using E_commerce_Admin_Dashboard.Models;
@@ -13,30 +15,38 @@ namespace Services
     public class ValidationService : IValidationService
     {
         private readonly IJwtHelper _jwtHelper;
-        public ValidationService(IJwtHelper jwtHelper)
+        private readonly IAdminRepository _adminRepo;
+        private readonly IUserRepository _userRepo;
+        public ValidationService(IJwtHelper jwtHelper, IAdminRepository adminRepo, IUserRepository userRepo)
         {
+            _adminRepo = adminRepo;
             _jwtHelper = jwtHelper;
+            _userRepo = userRepo;
         }
         public ServiceResult<CustomerRegisterRequest> ValidateCustomerRegistration(CustomerRegisterRequest req)
         {
-            var result = ValidateEmail(req.Email);
-            if (!result.OK)
-                return ServiceResult<CustomerRegisterRequest>.Fail($"{result.ErrorMessage}", result.StatusCode);
+            if (req == null)
+                return ServiceResult<CustomerRegisterRequest>.Fail("Request cannot be null.", 400);
 
-            result = ValidatePassword(req.Password);
-            if (!result.OK)
-                return ServiceResult<CustomerRegisterRequest>.Fail($"{result.ErrorMessage}", result.StatusCode);
+            var emailResult = ValidateEmail(req.Email);
+            if (!emailResult.OK)
+                return ServiceResult<CustomerRegisterRequest>.Fail(emailResult.ErrorMessage, emailResult.StatusCode);
 
-            result = ValidatePhoneNumber(req.PhoneNumber);
-            if (!result.OK)
-                return ServiceResult<CustomerRegisterRequest>.Fail($"{result.ErrorMessage}", result.StatusCode);
+            var passwordResult = ValidatePassword(req.Password);
+            if (!passwordResult.OK)
+                return ServiceResult<CustomerRegisterRequest>.Fail(passwordResult.ErrorMessage, passwordResult.StatusCode);
+
+            var phoneResult = ValidatePhoneNumber(req.PhoneNumber);
+            if (!phoneResult.OK)
+                return ServiceResult<CustomerRegisterRequest>.Fail(phoneResult.ErrorMessage, phoneResult.StatusCode);
 
             var addressResult = ValidateAddress(req.CustomerAddress);
             if (!addressResult.OK)
-                return ServiceResult<CustomerRegisterRequest>.Fail($"{addressResult.ErrorMessage}", result.StatusCode);
+                return ServiceResult<CustomerRegisterRequest>.Fail(addressResult.ErrorMessage, addressResult.StatusCode);
 
             return ServiceResult<CustomerRegisterRequest>.Success(req, 200);
         }
+
 
         public ServiceResult<CustomerAddressCreateRequest> ValidateAddress(CustomerAddressCreateRequest address)
         {
@@ -156,15 +166,33 @@ namespace Services
             };
         }
 
-        public async Task<ServiceResult<bool>> ValidateSuperAdminRole(string token)
+        public ServiceResult<CreateAdminRequest> ValidateCreateAdminRequest(CreateAdminRequest req)
         {
-            var validationResult = await _jwtHelper.ValidateTokenAsync(token, TokenType.Access);
-            if (!validationResult.OK) return ServiceResult<bool>.Fail(validationResult.ErrorMessage, validationResult.StatusCode);
+            if (req == null)
+                return ServiceResult<CreateAdminRequest>.Fail("Request cannot be null.", 400);
 
-            var roleCheckingResult = await _jwtHelper.IsSuperAdmin(validationResult.Data);
-            if (!roleCheckingResult.OK) return ServiceResult<bool>.Fail(roleCheckingResult.ErrorMessage, roleCheckingResult.StatusCode);
+            var emailResult = ValidateEmail(req.Email);
+            if (!emailResult.OK)
+                return ServiceResult<CreateAdminRequest>.Fail(emailResult.ErrorMessage, emailResult.StatusCode);
 
-            return ServiceResult<bool>.Success(roleCheckingResult.Data, 200);
+            var phoneResult = ValidatePhoneNumber(req.PhoneNumber);
+            if (!phoneResult.OK)
+                return ServiceResult<CreateAdminRequest>.Fail(phoneResult.ErrorMessage, phoneResult.StatusCode);
+
+            return ServiceResult<CreateAdminRequest>.Success(req, 200);
+        }
+
+        public async Task<ServiceResult<Admin>> ValidateAndReturnSuperAdminAsync(Guid UserId)
+        {
+            var matchedUser = await _userRepo.GetUserByIdAsync(UserId);
+            if (matchedUser == null) return ServiceResult<Admin>.Fail("No user found", 404);
+
+            var matchedAdmin = await _adminRepo.GetAdminByUserIdAsync(matchedUser.Id);
+            if (matchedAdmin == null) return ServiceResult<Admin>.Fail("No admin found.", 404);
+
+            if (!matchedAdmin.IsSuperAdmin) return ServiceResult<Admin>.Fail("User is not a super admin.", 401);
+
+            return ServiceResult<Admin>.Success(matchedAdmin, 200);
         }
     }
 

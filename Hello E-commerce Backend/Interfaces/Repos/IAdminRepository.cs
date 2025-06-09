@@ -7,5 +7,9 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Repos
         Task<Admin?> GetAdminByUserIdAsync(Guid userId);
 
         Task<List<Admin>> GetAllAdminsAsync(string? search, int limit, int page, string? sort);
+
+        Task<Admin> AddNewAdminAsync (Admin admin);
+
+        Task<Admin?> GetAdminByIdAsync (Guid id);
     }
 }

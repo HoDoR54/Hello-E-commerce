@@ -11,6 +11,19 @@ namespace E_commerce_Admin_Dashboard.Repositories
         {
             _context = context;
         }
+
+        public async Task<Admin> AddNewAdminAsync(Admin admin)
+        {
+            var entry = await _context.Admins.AddAsync(admin);
+            await _context.SaveChangesAsync();
+            return entry.Entity;
+        }
+
+        public async Task<Admin?> GetAdminByIdAsync(Guid id)
+        {
+            return await _context.Admins.FirstOrDefaultAsync(a => a.Id == id);
+        }
+
         public async Task<Admin?> GetAdminByUserIdAsync(Guid userId)
         {
             return await _context.Admins.FirstOrDefaultAsync(a => a.UserId == userId);

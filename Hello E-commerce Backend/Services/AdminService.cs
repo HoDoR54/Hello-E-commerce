@@ -1,6 +1,8 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Requests;
+using E_commerce_Admin_Dashboard.DTO.Requests.Admins;
 using E_commerce_Admin_Dashboard.DTO.Responses.Admins;
 using E_commerce_Admin_Dashboard.Helpers;
+using E_commerce_Admin_Dashboard.Interfaces.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Mappers;
 using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Interfaces.Services;
@@ -15,19 +17,42 @@ namespace E_commerce_Admin_Dashboard.Services
         private readonly IValidationService _validator;
         private readonly IAdminMapper _adminMapper;
         private readonly IUserRepository _userRepo;
-        public AdminService(IAdminRepository adminRepo, IValidationService validationService, IAdminMapper adminMapper, IUserRepository userRepo)
+        private readonly IJwtHelper _jwtHelper;
+        public AdminService(IJwtHelper jwtHelper, IAdminRepository adminRepo, IValidationService validationService, IAdminMapper adminMapper, IUserRepository userRepo)
         {
             _adminRepo = adminRepo;
             _validator = validationService;
             _adminMapper = adminMapper;
             _userRepo = userRepo;
+            _jwtHelper = jwtHelper;
+        }
+
+        public async Task<ServiceResult<AdminResponse>> CreateNewAdmin(string token, CreateAdminRequest req)
+        {
+            // validate role
+            Guid requestUserId = _jwtHelper.GetUserIdByToken(token);
+            var roleValidationResult = await _validator.ValidateAndReturnSuperAdminAsync(requestUserId);
+            if (!roleValidationResult.OK) return ServiceResult<AdminResponse>.Fail(roleValidationResult.ErrorMessage, roleValidationResult.StatusCode);
+
+            // validate credentials
+            var credentialsValidationResult = _validator.ValidateCreateAdminRequest(req);
+            if (!credentialsValidationResult.OK) return ServiceResult<AdminResponse>.Fail(credentialsValidationResult.ErrorMessage, credentialsValidationResult.StatusCode);
+
+            var mappedUser = _adminMapper.CreateAdminRequestToUserModel(req);
+            var user = await _userRepo.AddNewUserAsync(mappedUser);
+
+            var mappedAdmin = _adminMapper.CreateAdminRequestToAdminModel(req, user, roleValidationResult.Data);
+            var admin = await _adminRepo.AddNewAdminAsync(mappedAdmin);
+
+            var response = _adminMapper.ToAdminLoginResponse(user, admin);
+            return ServiceResult<AdminResponse>.Success(response, 200);
         }
 
         public async Task<ServiceResult<List<AdminResponse>>> GetAllAdmins(string token ,string? search, int limit, int page, string? sort)
         {
-            var validationResult = await _validator.ValidateSuperAdminRole(token);
-            if (!validationResult.OK) return ServiceResult<List<AdminResponse>>.Fail(validationResult.ErrorMessage, validationResult.StatusCode);
-            if (validationResult.Data == false) return ServiceResult<List<AdminResponse>>.Fail("User not a super admin.", 401);
+            Guid requestUserId = _jwtHelper.GetUserIdByToken(token);
+            var roleValidationResult = await _validator.ValidateAndReturnSuperAdminAsync(requestUserId);
+            if (!roleValidationResult.OK) return ServiceResult<List<AdminResponse>>.Fail(roleValidationResult.ErrorMessage, roleValidationResult.StatusCode);
 
             var admins = await _adminRepo.GetAllAdminsAsync(search, limit, page, sort);
             List<AdminResponse> mappedAdmins = new List<AdminResponse>();
