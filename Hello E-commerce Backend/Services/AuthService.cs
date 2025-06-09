@@ -21,6 +21,7 @@ namespace Services
         private readonly IPasswordHasher _passwordHasher;
         private readonly IAdminMapper _adminMapper;
         private readonly ICustomerMapper _customerMapper;
+        private readonly IGeneralMapper _generalMapper;
 
         public AuthService(
         IJwtHelper jwtHelper,
@@ -30,7 +31,8 @@ namespace Services
         ICustomerRepository customerRepository,
         IPasswordHasher passwordHasher,
         ICustomerMapper customerMapper,
-        IAdminMapper adminMapper)
+        IAdminMapper adminMapper,
+        IGeneralMapper generalMapper)
         {
             _userRepository = userRepository;
             _authRepository = authRepository;
@@ -40,6 +42,7 @@ namespace Services
             _passwordHasher = passwordHasher;
             _customerMapper = customerMapper;
             _adminMapper = adminMapper;
+            _generalMapper = generalMapper;
         }
 
         public async Task<ServiceResult<AdminResponse>> LoginAsAdminAsync(LoginRequest request)
@@ -102,10 +105,10 @@ namespace Services
             }
 
             var response = _customerMapper.CustomerRegisterModelsToResponse(newUser, newCustomer, formattedAddress);
-            return ServiceResult<CustomerRegisterResponse>.Success(response, 200);
+            return ServiceResult<CustomerRegisterResponse>.Success(response, 201);
         }
 
-        public async Task<ServiceResult<string>> GenerateTokenAsync(string? email, TokenType type, string? refreshToken)
+        public async Task<ServiceResult<string>> GenerateTokenAsync(string? email, TokenType type)
         {
             if (string.IsNullOrEmpty(email))
                 return ServiceResult<string>.Fail("Email is required.", 400);
@@ -126,7 +129,7 @@ namespace Services
 
             RefreshToken matchedToken = await _userRepository.GetRefreshTokenAsync(refreshToken);
             string email = matchedToken.User.Email;
-            var newAccessToken = await GenerateTokenAsync(email, TokenType.Access, refreshToken);
+            var newAccessToken = await GenerateTokenAsync(email, TokenType.Access);
             if (!newAccessToken.OK)
                 return ServiceResult<string>.Fail(newAccessToken.ErrorMessage, newAccessToken.StatusCode);
 
@@ -135,10 +138,10 @@ namespace Services
 
         public async Task<ServiceResult<TokenPair>> GenerateTokenPairAsync(string email)
         {
-            var refreshResult = await GenerateTokenAsync(email, TokenType.Refresh, null);
+            var refreshResult = await GenerateTokenAsync(email, TokenType.Refresh);
             if (!refreshResult.OK) return ServiceResult<TokenPair>.Fail(refreshResult.ErrorMessage, refreshResult.StatusCode);
 
-            var accessResult = await GenerateTokenAsync(email, TokenType.Access, null);
+            var accessResult = await GenerateTokenAsync(email, TokenType.Access);
             if (!accessResult.OK) return ServiceResult<TokenPair>.Fail(accessResult.ErrorMessage, accessResult.StatusCode);
 
             var tokenPair = new TokenPair
@@ -164,6 +167,16 @@ namespace Services
             return user == null
                 ? ServiceResult<User>.Fail("User not found.", 404)
                 : ServiceResult<User>.Success(user, 200);
+        }
+
+        public async Task<ServiceResult<RefreshToken>> SaveRefreshTokenToDatabase(string refreshToken)
+        {
+            var userId = _jwtHelper.GetUserIdByToken(refreshToken);
+            var tokenModel = _generalMapper.RefreshTokenStringToModel(refreshToken, userId);
+            var repoResult = await _authRepository.AddNewRefreshToken(tokenModel);
+            if (repoResult == null) return ServiceResult<RefreshToken>.Fail("Adding the token failed.", 500);
+
+            return ServiceResult<RefreshToken>.Success(repoResult, 201);
         }
     }
 

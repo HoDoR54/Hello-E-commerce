@@ -45,7 +45,7 @@ namespace E_commerce_Admin_Dashboard.Services
             var admin = await _adminRepo.AddNewAdminAsync(mappedAdmin);
 
             var response = _adminMapper.ToAdminLoginResponse(user, admin);
-            return ServiceResult<AdminResponse>.Success(response, 200);
+            return ServiceResult<AdminResponse>.Success(response, 201);
         }
 
         public async Task<ServiceResult<AdminResponse>> GetAdminByIdAsync(string token, Guid id)

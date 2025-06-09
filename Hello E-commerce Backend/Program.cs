@@ -40,6 +40,7 @@ builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 
 builder.Services.AddScoped<ICustomerMapper, CustomerMapper>();
 builder.Services.AddScoped<IAdminMapper, AdminMapper>();
+builder.Services.AddScoped<IGeneralMapper, GeneralMapper>();
 
 var app = builder.Build();
 
