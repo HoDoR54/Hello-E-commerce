@@ -12,6 +12,14 @@ namespace E_commerce_Admin_Dashboard.Repositories
         {
             _context = context;
         }
+
+        public async Task<RefreshToken> AddNewRefreshToken(RefreshToken token)
+        {
+            var entry = await _context.RefreshTokens.AddAsync(token);
+            await _context.SaveChangesAsync();
+            return entry.Entity;
+        }
+
         public async Task<Admin?> GetAdminByUserIdAsync(Guid Id)
         {
             return await _context.Admins
