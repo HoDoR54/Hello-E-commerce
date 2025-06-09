@@ -86,20 +86,15 @@ namespace E_commerce_Admin_Dashboard.Helpers
             return ServiceResult<string>.Success(token, 200);
         }
 
-        public async Task<ServiceResult<bool>> IsSuperAdmin(string token)
+        public Guid GetUserIdByToken(string token)
         {
             var jwt = _jwtHandler.ReadJwtToken(token);
-            var role = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (role != UserRole.Admin.ToString()) return ServiceResult<bool>.Fail("User not an admin.", 401);
+            var userIdString = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-            var email = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            if (email == null) return ServiceResult<bool>.Fail("No email in the token.", 400);
-            var matchedUser = await _userRepo.GetUserByEmailAsync(email);
-            if (matchedUser == null) return ServiceResult<bool>.Fail("No user found.", 404);
-            var matchedAdmin = await _adminRepo.GetAdminByUserIdAsync(matchedUser.Id);
-            if (matchedAdmin == null) return ServiceResult<bool>.Fail("No admin record found.", 404);
+            if (Guid.TryParse(userIdString, out var userId))
+                return userId;
 
-            return ServiceResult<bool>.Success(matchedAdmin.IsSuperAdmin, 200);
+            throw new InvalidOperationException("Invalid or missing user ID in token.");
         }
     }
 }

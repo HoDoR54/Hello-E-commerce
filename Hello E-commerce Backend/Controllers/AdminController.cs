@@ -1,4 +1,5 @@
-﻿using E_commerce_Admin_Dashboard.Interfaces.Repos;
+﻿using E_commerce_Admin_Dashboard.DTO.Requests.Admins;
+using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,5 +38,19 @@ namespace E_commerce_Admin_Dashboard.Controllers
             return Ok(serviceResponse);
         }
 
+        // Create a new admin
+        [HttpPost]
+        public async Task<IActionResult> CreateAdmin([FromBody] CreateAdminRequest req)
+        {
+            var token = Request.Cookies["access_token"];
+            if (token == null) return Unauthorized("Token missing.");
+
+            var serviceResponse = await _adminService.CreateNewAdmin(token, req);
+
+            if (!serviceResponse.OK)
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+
+            return Ok(serviceResponse);
+        }
     }
 }
