@@ -30,7 +30,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
 
             if (token == null) return Unauthorized("Token missing.");
 
-            var serviceResponse = await _adminService.GetAllAdmins(token, search, limit, page, sort);
+            var serviceResponse = await _adminService.GetAllAdminsAsync(token, search, limit, page, sort);
 
             if (!serviceResponse.OK)
                 return StatusCode(serviceResponse.StatusCode, serviceResponse);
@@ -45,8 +45,22 @@ namespace E_commerce_Admin_Dashboard.Controllers
             var token = Request.Cookies["access_token"];
             if (token == null) return Unauthorized("Token missing.");
 
-            var serviceResponse = await _adminService.CreateNewAdmin(token, req);
+            var serviceResponse = await _adminService.CreateNewAdminAsync(token, req);
 
+            if (!serviceResponse.OK)
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+
+            return Ok(serviceResponse);
+        }
+
+        // Get admin details by Id
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAdminById([FromRoute] Guid id)
+        {
+            var token = Request.Cookies["access_token"];
+            if (token == null) return Unauthorized("Token missing.");
+
+            var serviceResponse = await _adminService.GetAdminByIdAsync(token, id);
             if (!serviceResponse.OK)
                 return StatusCode(serviceResponse.StatusCode, serviceResponse);
 
