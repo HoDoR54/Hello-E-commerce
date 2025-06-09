@@ -27,7 +27,7 @@ namespace E_commerce_Admin_Dashboard.Services
             _jwtHelper = jwtHelper;
         }
 
-        public async Task<ServiceResult<AdminResponse>> CreateNewAdmin(string token, CreateAdminRequest req)
+        public async Task<ServiceResult<AdminResponse>> CreateNewAdminAsync(string token, CreateAdminRequest req)
         {
             // validate role
             Guid requestUserId = _jwtHelper.GetUserIdByToken(token);
@@ -48,7 +48,24 @@ namespace E_commerce_Admin_Dashboard.Services
             return ServiceResult<AdminResponse>.Success(response, 200);
         }
 
-        public async Task<ServiceResult<List<AdminResponse>>> GetAllAdmins(string token ,string? search, int limit, int page, string? sort)
+        public async Task<ServiceResult<AdminResponse>> GetAdminByIdAsync(string token, Guid id)
+        {
+            // validate role
+            Guid requestUserId = _jwtHelper.GetUserIdByToken(token);
+            var roleValidationResult = await _validator.ValidateAndReturnSuperAdminAsync(requestUserId);
+            if (!roleValidationResult.OK) return ServiceResult<AdminResponse>.Fail(roleValidationResult.ErrorMessage, roleValidationResult.StatusCode);
+
+            var matchedAdmin = await _adminRepo.GetAdminByIdAsync(id);
+            if (matchedAdmin == null) return ServiceResult<AdminResponse>.Fail("No admin record found.", 404);
+
+            var matchedUser = await _userRepo.GetUserByIdAsync(matchedAdmin.UserId);
+            if (matchedUser == null) return ServiceResult<AdminResponse>.Fail("No user record found.", 404);
+
+            var mappedResponse = _adminMapper.ToAdminLoginResponse(matchedUser, matchedAdmin);
+            return ServiceResult<AdminResponse>.Success(mappedResponse, 200);
+        }
+
+        public async Task<ServiceResult<List<AdminResponse>>> GetAllAdminsAsync(string token ,string? search, int limit, int page, string? sort)
         {
             Guid requestUserId = _jwtHelper.GetUserIdByToken(token);
             var roleValidationResult = await _validator.ValidateAndReturnSuperAdminAsync(requestUserId);
