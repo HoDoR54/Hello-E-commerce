@@ -35,7 +35,6 @@ namespace E_commerce_Admin_Dashboard.Controllers
 
             _cookiesHelper.SetRefreshTokenCookies(Response, tokenResult.Data.RefreshToken);
             _cookiesHelper.SetAccessTokenCookies(Response, tokenResult.Data.AccessToken);
-            _authServices.SaveRefreshTokenToDatabase(tokenResult.Data.RefreshToken);
 
             return StatusCode(loginResult.StatusCode, loginResult);
         }

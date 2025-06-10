@@ -14,17 +14,8 @@ namespace E_commerce_Admin_Dashboard.Repositories
             _context = context;
         }
 
-        public async Task<CustomerAddressDetail> AddNewCustomerAddressDetailAsync(Customer customer, CustomerAddress address)
+        public async Task<CustomerAddressDetail> AddNewCustomerAddressDetailAsync(CustomerAddressDetail customerAddressDetail)
         {
-            CustomerAddressDetail customerAddressDetail = new CustomerAddressDetail
-            {
-                Id = new Guid(),
-                CustomerId = customer.Id,
-                AddressId = address.Id,
-                Customer = customer,
-                CustomerAddress = address,
-            };
-
             await _context.CustomerAddressDetails.AddAsync(customerAddressDetail);
             await _context.SaveChangesAsync();
             return customerAddressDetail;

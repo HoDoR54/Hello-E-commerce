@@ -102,4 +102,16 @@ public class CustomerMapper : ICustomerMapper
             CustomerAddress = CustomerAddressModelToResponse(address),
         };
     }
+
+    public CustomerAddressDetail AddressAndCustomerToCustomerAddressDetail(CustomerAddress address, Customer customer)
+    {
+        return new CustomerAddressDetail
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = customer.Id,
+            AddressId = address.Id,
+            Customer = customer,
+            CustomerAddress = address,
+        };
+    }
 }

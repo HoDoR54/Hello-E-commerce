@@ -15,5 +15,5 @@ public interface IAuthService
     Task<ServiceResult<User>> GetUserByEmailAsync(string email);
     Task<ServiceResult<string>> RefreshAccessToken(string refreshToken);
 
-    Task<ServiceResult<RefreshToken>> SaveRefreshTokenToDatabase (string refreshToken);
+    Task<ServiceResult<RefreshToken>> AddNewRefreshTokenAsync (string refreshToken);
 }

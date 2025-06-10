@@ -20,18 +20,18 @@ namespace E_commerce_Admin_Dashboard.Repositories
             return entry.Entity;
         }
 
-        public async Task<Admin?> GetAdminByUserIdAsync(Guid Id)
+        public async Task<Admin?> GetAdminByUserIdAsync(Guid id)
         {
             return await _context.Admins
                                  .Include(a => a.User)
-                                 .FirstOrDefaultAsync(a => a.User.Id == Id);
+                                 .FirstOrDefaultAsync(a => a.User.Id == id);
         }
 
-        public async Task<Customer?> GetCustomerByUserIdAsync(Guid Id)
+        public async Task<Customer?> GetCustomerByUserIdAsync(Guid id)
         {
             return await _context.Customers
                                 .Include(a => a.User)
-                                .FirstOrDefaultAsync(a => a.User.Id == Id);
+                                .FirstOrDefaultAsync(a => a.User.Id == id);
         }
 
         public async Task<User?> GetUserByEmailAsync(string email)

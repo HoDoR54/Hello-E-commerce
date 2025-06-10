@@ -3,6 +3,7 @@
     public interface ICookiesHelper
     {
         void SetAccessTokenCookies(HttpResponse response, string accessToken);
+        void ClearTokenCookies(HttpResponse response);
         void SetRefreshTokenCookies(HttpResponse response, string refreshToken);
     }
 }

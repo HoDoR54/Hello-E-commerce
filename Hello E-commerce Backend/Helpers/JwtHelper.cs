@@ -21,7 +21,7 @@ namespace E_commerce_Admin_Dashboard.Helpers
     public class JwtHelper : IJwtHelper
     {
         private readonly IConfiguration _configuration;
-        private readonly JwtSecurityTokenHandler _jwtHandler = new JwtSecurityTokenHandler();
+        private static readonly JwtSecurityTokenHandler _jwtHandler = new JwtSecurityTokenHandler();
         private readonly IUserRepository _userRepo;
         private readonly IAdminRepository _adminRepo;
         public JwtHelper (IConfiguration configuration, IUserRepository userRepository, IAdminRepository adminRepo)

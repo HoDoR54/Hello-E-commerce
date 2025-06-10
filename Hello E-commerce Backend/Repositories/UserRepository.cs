@@ -32,7 +32,7 @@ namespace E_commerce_Admin_Dashboard.Repositories
 
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            return await _context.Users.FindAsync(id);
         }
     }
 }

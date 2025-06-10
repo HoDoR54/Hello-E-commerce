@@ -75,7 +75,7 @@ namespace E_commerce_Admin_Dashboard.Services
             List<AdminResponse> mappedAdmins = new List<AdminResponse>();
             foreach (var admin in admins)
             {
-                User matchedUser = await _userRepo.GetUserByIdAsync(admin.UserId);
+                User? matchedUser = await _userRepo.GetUserByIdAsync(admin.UserId);
                 if (matchedUser == null) return ServiceResult<List<AdminResponse>>.Fail("No user found.", 404);
                 AdminResponse mapped = _adminMapper.ToAdminLoginResponse(matchedUser, admin);
                 mappedAdmins.Add(mapped);
