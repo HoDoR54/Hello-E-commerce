@@ -116,7 +116,8 @@ namespace E_commerce_Admin_Dashboard.Controllers
 
             _cookiesHelper.SetAccessTokenCookies(Response, newAccessTokenResult.Data);
 
-            return StatusCode(200, newAccessTokenResult);
+
+            return StatusCode(200, ServiceResult<string>.Success("Access token refreshed.", 200));
         }
     }
 }
