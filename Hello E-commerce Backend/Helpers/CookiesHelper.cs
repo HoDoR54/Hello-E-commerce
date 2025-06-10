@@ -1,34 +1,29 @@
 ﻿using E_commerce_Admin_Dashboard.Interfaces.Helpers;
-using Microsoft.Identity.Client;
 
-namespace E_commerce_Admin_Dashboard.Helpers
+public class CookiesHelper : ICookiesHelper
 {
-    public class CookiesHelper : ICookiesHelper
+    private CookieOptions GetCookieOptions(TimeSpan maxAge) => new CookieOptions
     {
-        public void SetAccessTokenCookies (HttpResponse response, string accessToken)
-        {
-            var options = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                MaxAge = TimeSpan.FromMinutes(15),
-                IsEssential = true
-            };
-            response.Cookies.Append("access_token", accessToken, options);
-        }
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.None,
+        MaxAge = maxAge,
+        IsEssential = true
+    };
 
-        public void SetRefreshTokenCookies (HttpResponse response, string refreshToken)
-        {
-            var options = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                MaxAge = TimeSpan.FromDays(7),
-                IsEssential = true
-            };
-            response.Cookies.Append("refresh_token", refreshToken, options);
-        }
+    public void SetAccessTokenCookies(HttpResponse response, string accessToken)
+    {
+        response.Cookies.Append("access_token", accessToken, GetCookieOptions(TimeSpan.FromMinutes(15)));
+    }
+
+    public void SetRefreshTokenCookies(HttpResponse response, string refreshToken)
+    {
+        response.Cookies.Append("refresh_token", refreshToken, GetCookieOptions(TimeSpan.FromDays(7)));
+    }
+
+    public void ClearTokenCookies(HttpResponse response)
+    {
+        response.Cookies.Delete("access_token");
+        response.Cookies.Delete("refresh_token");
     }
 }

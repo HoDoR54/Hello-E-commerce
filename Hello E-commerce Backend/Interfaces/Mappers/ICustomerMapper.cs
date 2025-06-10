@@ -11,6 +11,8 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Mappers
         Customer CustomerRegisterToCustomerModel(CustomerRegisterRequest req, User user);
         CustomerAddress CustomerAddressRegisterToModel(CustomerAddressCreateRequest address);
         CustomerAddressResponse CustomerAddressModelToResponse(CustomerAddress address);
+
+        CustomerAddressDetail AddressAndCustomerToCustomerAddressDetail (CustomerAddress address,  Customer customer);
         CustomerRegisterResponse CustomerRegisterModelsToResponse(User user, Customer customer, CustomerAddress address);
     }
 }

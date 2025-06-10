@@ -13,10 +13,10 @@ namespace Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IAuthRepository _authRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IAuthRepository _authRepo;
+        private readonly IUserRepository _userRepo;
         private readonly IValidationService _validator;
-        private readonly ICustomerRepository _customerRepository;
+        private readonly ICustomerRepository _customerRepo;
         private readonly IJwtHelper _jwtHelper;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IAdminMapper _adminMapper;
@@ -28,16 +28,16 @@ namespace Services
         IAuthRepository authRepository,
         IValidationService validator,
         IUserRepository userRepository,
-        ICustomerRepository customerRepository,
+        ICustomerRepository customerRepo,
         IPasswordHasher passwordHasher,
         ICustomerMapper customerMapper,
         IAdminMapper adminMapper,
         IGeneralMapper generalMapper)
         {
-            _userRepository = userRepository;
-            _authRepository = authRepository;
+            _userRepo = userRepository;
+            _authRepo = authRepository;
             _validator = validator;
-            _customerRepository = customerRepository;
+            _customerRepo = customerRepo;
             _jwtHelper = jwtHelper;
             _passwordHasher = passwordHasher;
             _customerMapper = customerMapper;
@@ -47,10 +47,10 @@ namespace Services
 
         public async Task<ServiceResult<AdminResponse>> LoginAsAdminAsync(LoginRequest request)
         {
-            var user = await _authRepository.GetUserByEmailAsync(request.Email);
+            var user = await _authRepo.GetUserByEmailAsync(request.Email);
             if (user == null) return ServiceResult<AdminResponse>.Fail("User not found.", 404);
 
-            var admin = await _authRepository.GetAdminByUserIdAsync(user.Id);
+            var admin = await _authRepo.GetAdminByUserIdAsync(user.Id);
             if (admin == null) return ServiceResult<AdminResponse>.Fail("User is not an admin.", 404);
 
             if (!_passwordHasher.Verify(request.Password, user.Password))
@@ -62,10 +62,10 @@ namespace Services
 
         public async Task<ServiceResult<CustomerLoginResponse>> LoginAsCustomerAsync(LoginRequest request)
         {
-            var user = await _authRepository.GetUserByEmailAsync(request.Email);
+            var user = await _authRepo.GetUserByEmailAsync(request.Email);
             if (user == null) return ServiceResult<CustomerLoginResponse>.Fail("User not found.", 404);
 
-            var customer = await _authRepository.GetCustomerByUserIdAsync(user.Id);
+            var customer = await _authRepo.GetCustomerByUserIdAsync(user.Id);
             if (customer == null) return ServiceResult<CustomerLoginResponse>.Fail("User is not a customer.", 404);
 
             if (!_passwordHasher.Verify(request.Password, user.Password))
@@ -77,31 +77,33 @@ namespace Services
 
         public async Task<ServiceResult<CustomerRegisterResponse>> RegisterCustomerAsync(CustomerRegisterRequest request)
         {
-            var validation = _validator.ValidateCustomerRegistration(request);
-            if (!validation.OK)
-                return ServiceResult<CustomerRegisterResponse>.Fail(validation.ErrorMessage, validation.StatusCode);
+            var credentialsValidation = _validator.ValidateCustomerRegistration(request);
+            if (!credentialsValidation.OK)
+                return ServiceResult<CustomerRegisterResponse>.Fail(credentialsValidation.ErrorMessage, credentialsValidation.StatusCode);
 
             var newUser = _customerMapper.CustomerRegisterToUserModel(request);
             var newCustomer = _customerMapper.CustomerRegisterToCustomerModel(request, newUser);
             var newAddress = _customerMapper.CustomerAddressRegisterToModel(request.CustomerAddress);
             var formattedAddress = _validator.ReformatAddress(newAddress);
 
-            var addressExists = await _customerRepository.AddressExistsAsync(formattedAddress);
+            var addressExists = await _customerRepo.AddressExistsAsync(formattedAddress);
             var existingAddress = addressExists
-                ? await _customerRepository.GetCustomerAddressByAddressAsync(formattedAddress)
+                ? await _customerRepo.GetCustomerAddressByAddressAsync(formattedAddress)
                 : null;
 
-            await _userRepository.AddNewUserAsync(newUser);
-            await _customerRepository.AddNewCustomerAsync(newCustomer);
+            await _userRepo.AddNewUserAsync(newUser);
+            await _customerRepo.AddNewCustomerAsync(newCustomer);
 
-            if (!addressExists)
+            if (existingAddress == null)
             {
-                await _customerRepository.AddNewCustomerAddressAsync(formattedAddress);
-                await _customerRepository.AddNewCustomerAddressDetailAsync(newCustomer, formattedAddress);
+                await _customerRepo.AddNewCustomerAddressAsync(formattedAddress);
+                var customerAddressDetail = _customerMapper.AddressAndCustomerToCustomerAddressDetail(formattedAddress, newCustomer);
+                await _customerRepo.AddNewCustomerAddressDetailAsync(customerAddressDetail);
             }
             else
             {
-                await _customerRepository.AddNewCustomerAddressDetailAsync(newCustomer, existingAddress);
+                var customerAddressDetail = _customerMapper.AddressAndCustomerToCustomerAddressDetail(existingAddress, newCustomer);
+                await _customerRepo.AddNewCustomerAddressDetailAsync(customerAddressDetail);
             }
 
             var response = _customerMapper.CustomerRegisterModelsToResponse(newUser, newCustomer, formattedAddress);
@@ -127,7 +129,8 @@ namespace Services
             if (!refreshResult.OK)
                 return ServiceResult<string>.Fail(refreshResult.ErrorMessage, refreshResult.StatusCode);
 
-            RefreshToken matchedToken = await _userRepository.GetRefreshTokenAsync(refreshToken);
+            RefreshToken? matchedToken = await _userRepo.GetRefreshTokenAsync(refreshToken);
+            if (matchedToken == null) return ServiceResult<string>.Fail("Inavlid refresh token.", 400);
             string email = matchedToken.User.Email;
             var newAccessToken = await GenerateTokenAsync(email, TokenType.Access);
             if (!newAccessToken.OK)
@@ -140,6 +143,7 @@ namespace Services
         {
             var refreshResult = await GenerateTokenAsync(email, TokenType.Refresh);
             if (!refreshResult.OK) return ServiceResult<TokenPair>.Fail(refreshResult.ErrorMessage, refreshResult.StatusCode);
+            await AddNewRefreshTokenAsync(refreshResult.Data);
 
             var accessResult = await GenerateTokenAsync(email, TokenType.Access);
             if (!accessResult.OK) return ServiceResult<TokenPair>.Fail(accessResult.ErrorMessage, accessResult.StatusCode);
@@ -163,17 +167,17 @@ namespace Services
 
         public async Task<ServiceResult<User>> GetUserByEmailAsync(string email)
         {
-            var user = await _userRepository.GetUserByEmailAsync(email);
+            var user = await _userRepo.GetUserByEmailAsync(email);
             return user == null
                 ? ServiceResult<User>.Fail("User not found.", 404)
                 : ServiceResult<User>.Success(user, 200);
         }
 
-        public async Task<ServiceResult<RefreshToken>> SaveRefreshTokenToDatabase(string refreshToken)
+        public async Task<ServiceResult<RefreshToken>> AddNewRefreshTokenAsync(string refreshToken)
         {
             var userId = _jwtHelper.GetUserIdByToken(refreshToken);
             var tokenModel = _generalMapper.RefreshTokenStringToModel(refreshToken, userId);
-            var repoResult = await _authRepository.AddNewRefreshToken(tokenModel);
+            var repoResult = await _authRepo.AddNewRefreshToken(tokenModel);
             if (repoResult == null) return ServiceResult<RefreshToken>.Fail("Adding the token failed.", 500);
 
             return ServiceResult<RefreshToken>.Success(repoResult, 201);

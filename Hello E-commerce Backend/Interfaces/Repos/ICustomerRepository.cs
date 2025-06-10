@@ -7,7 +7,7 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Repos
     {
         Task<Customer> AddNewCustomerAsync(Customer customer);
 
-        Task<CustomerAddressDetail> AddNewCustomerAddressDetailAsync(Customer customer, CustomerAddress address);
+        Task<CustomerAddressDetail> AddNewCustomerAddressDetailAsync(CustomerAddressDetail customerAddressDetail);
 
         Task<bool> AddressExistsAsync(CustomerAddress address);
 
