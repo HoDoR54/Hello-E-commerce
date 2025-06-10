@@ -131,7 +131,9 @@ namespace Services
 
             RefreshToken? matchedToken = await _userRepo.GetRefreshTokenAsync(refreshToken);
             if (matchedToken == null) return ServiceResult<string>.Fail("Inavlid refresh token.", 400);
-            string email = matchedToken.User.Email;
+            var matchedUser = await _userRepo.GetUserByIdAsync(matchedToken.UserId);
+            if (matchedUser == null) return ServiceResult<string>.Fail("No user found.", 404);
+            var email = matchedUser?.Email;
             var newAccessToken = await GenerateTokenAsync(email, TokenType.Access);
             if (!newAccessToken.OK)
                 return ServiceResult<string>.Fail(newAccessToken.ErrorMessage, newAccessToken.StatusCode);
