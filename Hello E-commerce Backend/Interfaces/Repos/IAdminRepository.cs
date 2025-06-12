@@ -11,5 +11,7 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Repos
         Task<Admin> AddNewAdminAsync (Admin admin);
 
         Task<Admin?> GetAdminByIdAsync (Guid id);
+        Task<string?> UpdatePhoneNumAsync(Guid id, string phoneNumber);
+        Task<string?> UpdateNameAsync(Guid id, string name);
     }
 }
