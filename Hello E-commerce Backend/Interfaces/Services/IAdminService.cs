@@ -11,5 +11,7 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Services
         Task<ServiceResult<AdminResponse>> CreateNewAdminAsync (string token, CreateAdminRequest req);
 
         Task<ServiceResult<AdminResponse>> GetAdminByIdAsync (string token, Guid id);
+
+        Task<ServiceResult<AdminResponse>> UpdateAdminDetailsAsync (string token, UpdateAdminDetailsRequest req);
     }
 }

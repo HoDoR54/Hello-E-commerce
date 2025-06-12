@@ -56,7 +56,7 @@ namespace Services
             if (!_passwordHasher.Verify(request.Password, user.Password))
                 return ServiceResult<AdminResponse>.Fail("Incorrect password.", 401);
 
-            var response = _adminMapper.ToAdminLoginResponse(user, admin);
+            var response = _adminMapper.ToAdminResponse(user, admin);
             return ServiceResult<AdminResponse>.Success(response, 200);
         }
 
@@ -177,7 +177,7 @@ namespace Services
 
         public async Task<ServiceResult<RefreshToken>> AddNewRefreshTokenAsync(string refreshToken)
         {
-            var userId = _jwtHelper.GetUserIdByToken(refreshToken);
+            var userId = _jwtHelper.GetUserIdByTokenAsync(refreshToken);
             var tokenModel = _generalMapper.RefreshTokenStringToModel(refreshToken, userId);
             var repoResult = await _authRepo.AddNewRefreshToken(tokenModel);
             if (repoResult == null) return ServiceResult<RefreshToken>.Fail("Adding the token failed.", 500);

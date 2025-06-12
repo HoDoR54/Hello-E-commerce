@@ -50,5 +50,24 @@ namespace E_commerce_Admin_Dashboard.Repositories
             return await query.ToListAsync();
         }
 
+        public async Task<string?> UpdateNameAsync(Guid id, string name)
+        {
+            var admin = await _context.Admins.FirstOrDefaultAsync(a => a.Id == id);
+            if (admin == null) return null;
+
+            admin.Name = name;
+            await _context.SaveChangesAsync();
+            return admin.Name;
+        }
+
+        public async Task<string?> UpdatePhoneNumAsync(Guid id, string phoneNumber)
+        {
+            var admin = await _context.Admins.FirstOrDefaultAsync(a => a.Id == id);
+            if (admin == null) return null;
+
+            admin.PhoneNumber = phoneNumber;
+            await _context.SaveChangesAsync();
+            return admin.PhoneNumber;
+        }
     }
 }

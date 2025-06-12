@@ -11,5 +11,7 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Repos
 
         Task<RefreshToken?> GetRefreshTokenAsync(string refreshToken);
         Task<User?> GetUserByIdAsync(Guid id);
+
+        Task<string?> UpdateEmailAsync(Guid id, string email);
     }
 }

@@ -66,5 +66,15 @@ namespace E_commerce_Admin_Dashboard.Controllers
 
             return Ok(serviceResponse);
         }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateAdminDetailsAsync([FromBody] UpdateAdminDetailsRequest req)
+        {
+            var accessToken = Request.Cookies["access_token"];
+            if (accessToken == null) return Unauthorized("Token missing.");
+
+            var serviceResult = await _adminService.UpdateAdminDetailsAsync(accessToken, req);
+            return Ok();
+        }
     }
 }
