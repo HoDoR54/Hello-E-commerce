@@ -29,6 +29,8 @@ namespace E_commerce_Admin_Dashboard.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        public bool IsDeleted { get; set; } = false;
         public Admin AdminProfile { get; set; }
         public Customer CustomerProfile { get; set; }
     }
