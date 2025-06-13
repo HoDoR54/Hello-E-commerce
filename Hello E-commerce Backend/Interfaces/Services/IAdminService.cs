@@ -12,6 +12,8 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Services
 
         Task<ServiceResult<AdminResponse>> GetAdminByIdAsync (string token, Guid id);
 
-        Task<ServiceResult<AdminResponse>> UpdateAdminDetailsAsync (string token, UpdateAdminDetailsRequest req);
+        Task<ServiceResult<AdminResponse>> UpdateAdminDetailsAsync (Guid id, UpdateAdminDetailsRequest req);
+
+        Task<ServiceResult<AdminResponse>> DeleteAdminByIdAsync(Guid id);
     }
 }

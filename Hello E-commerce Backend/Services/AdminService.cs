@@ -50,6 +50,17 @@ namespace E_commerce_Admin_Dashboard.Services
             return ServiceResult<AdminResponse>.Success(response, 201);
         }
 
+        public async Task<ServiceResult<AdminResponse>> DeleteAdminByIdAsync(Guid id)
+        {
+            var deletedAdmin = await _adminRepo.DeleteAdminByIdAsync(id);
+            if (deletedAdmin == null) return ServiceResult<AdminResponse>.Fail("Deleting the admin failed.", 500);
+
+            var matchedUser = await _userRepo.GetUserByIdAsync(deletedAdmin.UserId);
+            if (matchedUser == null) return ServiceResult<AdminResponse>.Fail("No matched user found.", 404);
+            var response = _adminMapper.ToAdminResponse(matchedUser, deletedAdmin);
+            return ServiceResult<AdminResponse>.Success(response, 200);
+        }
+
         public async Task<ServiceResult<AdminResponse>> GetAdminByIdAsync(string token, Guid id)
         {
             // validate role
@@ -85,20 +96,16 @@ namespace E_commerce_Admin_Dashboard.Services
             return ServiceResult<List<AdminResponse>>.Success(mappedAdmins, 200);
         }
 
-        public async Task<ServiceResult<AdminResponse>> UpdateAdminDetailsAsync(string token, UpdateAdminDetailsRequest req)
+        public async Task<ServiceResult<AdminResponse>> UpdateAdminDetailsAsync(Guid id, UpdateAdminDetailsRequest req)
         {
-            // Check if the request is null
             if (req == null)
                 return ServiceResult<AdminResponse>.Fail("Request is empty.", 400);
 
-            // Fetch current user using the token
-            var userId = _jwtHelper.GetUserIdByTokenAsync(token);
-            var user = await _userRepo.GetUserByIdAsync(userId);
+            var user = await _userRepo.GetUserByIdAsync(id);
             if (user == null)
                 return ServiceResult<AdminResponse>.Fail("No user found.", 404);
 
-            // Fetch matched admin
-            var admin = await _adminRepo.GetAdminByUserIdAsync(userId);
+            var admin = await _adminRepo.GetAdminByUserIdAsync(id);
             if (admin == null)
                 return ServiceResult<AdminResponse>.Fail("No admin record found.", 404);
 
@@ -106,7 +113,6 @@ namespace E_commerce_Admin_Dashboard.Services
             string name = admin.Name;
             string phoneNumber = admin.PhoneNumber;
 
-            // Update Email if changed
             if (!string.IsNullOrWhiteSpace(req.Email) && req.Email != user.Email)
             {
                 var updated = await _userRepo.UpdateEmailAsync(user.Id, req.Email);
@@ -115,7 +121,6 @@ namespace E_commerce_Admin_Dashboard.Services
                 email = updated;
             }
 
-            // Update Name if changed
             if (!string.IsNullOrWhiteSpace(req.Name) && req.Name != admin.Name)
             {
                 var updated = await _adminRepo.UpdateNameAsync(user.Id, req.Name);
@@ -124,7 +129,6 @@ namespace E_commerce_Admin_Dashboard.Services
                 name = req.Name;
             }
 
-            // Update PhoneNumber if changed
             if (!string.IsNullOrWhiteSpace(req.PhoneNumber) && req.PhoneNumber != admin.PhoneNumber)
             {
                 var updated = await _adminRepo.UpdatePhoneNumAsync(user.Id, req.PhoneNumber);
@@ -140,6 +144,5 @@ namespace E_commerce_Admin_Dashboard.Services
 
             return ServiceResult<AdminResponse>.Success(response, 200);
         }
-
     }
 }

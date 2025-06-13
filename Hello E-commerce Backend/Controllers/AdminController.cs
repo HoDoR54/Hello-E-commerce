@@ -4,6 +4,7 @@ using E_commerce_Admin_Dashboard.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.MicrosoftExtensions;
+using System.Threading.Tasks;
 
 namespace E_commerce_Admin_Dashboard.Controllers
 {
@@ -67,14 +68,24 @@ namespace E_commerce_Admin_Dashboard.Controllers
             return Ok(serviceResponse);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateAdminDetailsAsync([FromBody] UpdateAdminDetailsRequest req)
+        // Update admin details
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAdminDetailsAsync([FromBody] UpdateAdminDetailsRequest req, [FromRoute] Guid id)
         {
-            var accessToken = Request.Cookies["access_token"];
-            if (accessToken == null) return Unauthorized("Token missing.");
+            var serviceResult = await _adminService.UpdateAdminDetailsAsync(id, req);
+            if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, serviceResult);
 
-            var serviceResult = await _adminService.UpdateAdminDetailsAsync(accessToken, req);
-            return Ok();
+            return Ok(serviceResult);
+        }
+
+        // Delete admin by Id
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAdminByIdAsync(Guid id)
+        {
+            var serviceResult = await _adminService.DeleteAdminByIdAsync(id);
+            if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, null);
+
+            return Ok(serviceResult);
         }
     }
 }
