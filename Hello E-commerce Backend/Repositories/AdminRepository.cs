@@ -1,6 +1,9 @@
-﻿using E_commerce_Admin_Dashboard.Interfaces.Repos;
+﻿using E_commerce_Admin_Dashboard.DTO.Responses.Admins;
+using E_commerce_Admin_Dashboard.Helpers;
+using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace E_commerce_Admin_Dashboard.Repositories
 {
@@ -17,6 +20,15 @@ namespace E_commerce_Admin_Dashboard.Repositories
             var entry = await _context.Admins.AddAsync(admin);
             await _context.SaveChangesAsync();
             return entry.Entity;
+        }
+
+        public async Task<Admin?> DeleteAdminByIdAsync(Guid id)
+        {
+            var matchedAdmin = await _context.Admins.FindAsync(id);
+            if (matchedAdmin == null) return null;
+            matchedAdmin.IsDeleted = true;            
+            await _context.SaveChangesAsync();
+            return await _context.Admins.FindAsync(id);
         }
 
         public async Task<Admin?> GetAdminByIdAsync(Guid id)
