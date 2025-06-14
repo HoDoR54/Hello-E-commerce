@@ -21,7 +21,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
 
         // Get all admins (can be done by super admins only)
         [HttpGet]
-        public async Task<IActionResult> GetAllAdmin(
+        public async Task<IActionResult> GetAllAdminAsync(
             [FromQuery] string? search,
             [FromQuery] int limit = 10,
             [FromQuery] int page = 1,
@@ -41,7 +41,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
 
         // Create a new admin
         [HttpPost]
-        public async Task<IActionResult> CreateAdmin([FromBody] CreateAdminRequest req)
+        public async Task<IActionResult> CreateAdminAsync([FromBody] CreateAdminRequest req)
         {
             var token = Request.Cookies["access_token"];
             if (token == null) return Unauthorized("Token missing.");
@@ -56,7 +56,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
 
         // Get admin details by Id
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAdminById([FromRoute] Guid id)
+        public async Task<IActionResult> GetAdminByIdAsync([FromRoute] Guid id)
         {
             var token = Request.Cookies["access_token"];
             if (token == null) return Unauthorized("Token missing.");
@@ -69,7 +69,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
         }
 
         // Update admin details
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateAdminDetailsAsync([FromBody] UpdateAdminDetailsRequest req, [FromRoute] Guid id)
         {
             var serviceResult = await _adminService.UpdateAdminDetailsAsync(id, req);
@@ -79,11 +79,36 @@ namespace E_commerce_Admin_Dashboard.Controllers
         }
 
         // Delete admin by Id
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAdminByIdAsync(Guid id)
+        [HttpPatch("soft-delete/{id}")]
+        public async Task<IActionResult> DeleteAdminByIdAsync([FromRoute] Guid id)
         {
             var serviceResult = await _adminService.DeleteAdminByIdAsync(id);
             if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, null);
+
+            return Ok(serviceResult);
+        }
+
+        // Promote the admin to super admin
+        [HttpPatch("promote/{id}")]
+        public async Task<IActionResult> PromoteToSuperAdminAsync([FromRoute] Guid id)
+        {
+            var token = Request.Cookies["access_token"];
+            if (token == null) return Unauthorized("Missing token.");
+
+            var serviceResult = await _adminService.PromoteAdminAsync(token, id);
+            if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, serviceResult);
+
+            return Ok(serviceResult);
+        }
+
+        [HttpPatch("demote/{id}")]
+        public async Task<IActionResult> DemoteFromSuperAdminAsync([FromRoute] Guid id)
+        {
+            var token = Request.Cookies["access_token"];
+            if (token == null) return Unauthorized("Missing token.");
+
+            var serviceResult = await _adminService.DemoteAdminAsync(token, id);
+            if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, serviceResult);
 
             return Ok(serviceResult);
         }
