@@ -15,5 +15,8 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Services
         Task<ServiceResult<AdminResponse>> UpdateAdminDetailsAsync (Guid id, UpdateAdminDetailsRequest req);
 
         Task<ServiceResult<AdminResponse>> DeleteAdminByIdAsync(Guid id);
+
+        Task<ServiceResult<AdminResponse>> PromoteAdminAsync(string token, Guid id);
+        Task<ServiceResult<AdminResponse>> DemoteAdminAsync(string token, Guid id);
     }
 }

@@ -16,5 +16,7 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Repos
         Task<string?> UpdateNameAsync(Guid id, string name);
         
         Task<Admin?> DeleteAdminByIdAsync(Guid id);
+        Task<Admin?> PromoteAdminAsync(Guid id);
+        Task<Admin?> DemoteAdminAsync(Guid id);
     }
 }

@@ -61,6 +61,21 @@ namespace E_commerce_Admin_Dashboard.Services
             return ServiceResult<AdminResponse>.Success(response, 200);
         }
 
+        public async Task<ServiceResult<AdminResponse>> DemoteAdminAsync(string token, Guid id)
+        {
+            Guid requestUserId = _jwtHelper.GetUserIdByTokenAsync(token);
+            var roleValidationResult = await _validator.ValidateAndReturnSuperAdminAsync(requestUserId);
+            if (!roleValidationResult.OK) return ServiceResult<AdminResponse>.Fail(roleValidationResult.ErrorMessage, roleValidationResult.StatusCode);
+
+            if (id == Guid.Empty) return ServiceResult<AdminResponse>.Fail("Empty request.", 400);
+            var demotedAdmin = await _adminRepo.DemoteAdminAsync(id);
+            if (demotedAdmin == null) return ServiceResult<AdminResponse>.Fail("Demoting the admin failed.", 500);
+            var matchedUser = await _userRepo.GetUserByIdAsync(demotedAdmin.UserId);
+            if (matchedUser == null) return ServiceResult<AdminResponse>.Fail("No user found.", 404);
+            var response = _adminMapper.ToAdminResponse(matchedUser, demotedAdmin);
+            return ServiceResult<AdminResponse>.Success(response, 200);
+        }
+
         public async Task<ServiceResult<AdminResponse>> GetAdminByIdAsync(string token, Guid id)
         {
             // validate role
@@ -94,6 +109,21 @@ namespace E_commerce_Admin_Dashboard.Services
                 mappedAdmins.Add(mapped);
             }
             return ServiceResult<List<AdminResponse>>.Success(mappedAdmins, 200);
+        }
+
+        public async Task<ServiceResult<AdminResponse>> PromoteAdminAsync(string token, Guid id)
+        {
+            Guid requestUserId = _jwtHelper.GetUserIdByTokenAsync(token);
+            var roleValidationResult = await _validator.ValidateAndReturnSuperAdminAsync(requestUserId);
+            if (!roleValidationResult.OK) return ServiceResult<AdminResponse>.Fail(roleValidationResult.ErrorMessage, roleValidationResult.StatusCode);
+
+            if (id == Guid.Empty) return ServiceResult<AdminResponse>.Fail("Empty request.", 400);
+            var promotedAdmin = await _adminRepo.PromoteAdminAsync(id);
+            if (promotedAdmin == null) return ServiceResult<AdminResponse>.Fail("Promoting the admin failed.", 500);
+            var matchedUser = await _userRepo.GetUserByIdAsync(promotedAdmin.UserId);
+            if (matchedUser == null) return ServiceResult<AdminResponse>.Fail("No user found.", 404);
+            var response = _adminMapper.ToAdminResponse(matchedUser, promotedAdmin);
+            return ServiceResult<AdminResponse>.Success(response, 200);
         }
 
         public async Task<ServiceResult<AdminResponse>> UpdateAdminDetailsAsync(Guid id, UpdateAdminDetailsRequest req)

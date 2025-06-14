@@ -81,5 +81,27 @@ namespace E_commerce_Admin_Dashboard.Repositories
             await _context.SaveChangesAsync();
             return admin.PhoneNumber;
         }
+
+        public async Task<Admin?> PromoteAdminAsync (Guid id)
+        {
+            var admin = await _context.Admins.FindAsync(id);
+            if (admin == null) return null;
+
+            if (admin.IsSuperAdmin) return null;
+            admin.IsSuperAdmin = true;
+            await _context.SaveChangesAsync();
+            return admin;
+        }
+
+        public async Task<Admin?> DemoteAdminAsync(Guid id)
+        {
+            var admin = await _context.Admins.FindAsync(id);
+            if (admin == null) return null;
+
+            if (!admin.IsSuperAdmin) return null;
+            admin.IsSuperAdmin = false;
+            await _context.SaveChangesAsync();
+            return admin;
+        }
     }
 }
