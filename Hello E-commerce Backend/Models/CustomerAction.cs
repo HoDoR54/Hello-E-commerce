@@ -48,7 +48,7 @@ namespace E_commerce_Admin_Dashboard.Models
         [ForeignKey("Purchase")]
         public Guid PurchaseId { get; set; }
 
-        public string Reason { get; set; }
+        public string? Reason { get; set; }
 
         public RefundStatus Status { get; set; }
     }

@@ -29,6 +29,13 @@ namespace E_commerce_Admin_Dashboard.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        public bool IsDeleted { get; set; } = false;
+        public bool IsWarned { get; set; } = false;
+        public int? WarningLevel { get; set; }
+
+        public bool IsBanned { get; set; } = false;
+        public int? BannedDays { get; set; }
         public Admin AdminProfile { get; set; }
         public Customer CustomerProfile { get; set; }
     }

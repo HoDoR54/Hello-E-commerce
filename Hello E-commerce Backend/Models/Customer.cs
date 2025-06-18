@@ -26,13 +26,7 @@ namespace E_commerce_Admin_Dashboard.Models
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-
-        public bool IsDeleted { get; set; }
-        public bool IsWarned { get; set; } = false;
-        public int? WarningLevel { get; set; }
-
-        public bool IsBanned { get; set; } = false;
-        public int? BannedDays { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         [Required]
         public DateTime DateOfBirth { get; set; }

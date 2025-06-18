@@ -35,6 +35,9 @@ namespace E_commerce_Admin_Dashboard.Mappers
                 Role = UserRole.Admin,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
+                IsDeleted = false,
+                IsBanned = false,
+                IsWarned = false,
             };
         }
 

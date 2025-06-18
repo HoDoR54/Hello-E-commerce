@@ -25,10 +25,6 @@ public class CustomerMapper : ICustomerMapper
             DateOfBirth = cus.DateOfBirth,
             CreatedAt = cus.CreatedAt,
             UpdatedAt = cus.UpdatedAt,
-            IsWarned = cus.IsWarned,
-            WarningLevel = cus.WarningLevel,
-            IsBanned = cus.IsBanned,
-            BannedDays = cus.BannedDays,
             LoyaltyPoints = cus.LoyaltyPoints
         };
     }
@@ -43,6 +39,9 @@ public class CustomerMapper : ICustomerMapper
             Role = UserRole.Customer,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
+            IsDeleted = false,
+            IsWarned = false,
+            IsBanned = false,
         };
     }
 
@@ -59,10 +58,6 @@ public class CustomerMapper : ICustomerMapper
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
             IsDeleted = false,
-            IsWarned = false,
-            WarningLevel = 0,
-            IsBanned = false,
-            BannedDays = 0,
             LoyaltyPoints = 0,
         };
     }
