@@ -78,19 +78,19 @@ public class AppDbContext : DbContext
             .Property(c => c.IsDeleted)
             .HasDefaultValue(false);
 
-        modelBuilder.Entity<Customer>()
+        modelBuilder.Entity<User>()
             .Property(c => c.IsWarned)
             .HasDefaultValue(false);
 
-        modelBuilder.Entity<Customer>()
+        modelBuilder.Entity<User>()
             .Property(c => c.IsBanned)
             .HasDefaultValue(false);
 
-        modelBuilder.Entity<Customer>()
+        modelBuilder.Entity<User>()
             .Property(c => c.BannedDays)
             .HasDefaultValue(0);
 
-        modelBuilder.Entity<Customer>()
+        modelBuilder.Entity<User>()
             .Property(c => c.WarningLevel)
             .HasDefaultValue(0);
 

@@ -17,17 +17,17 @@ namespace E_commerce_Admin_Dashboard.Models
         [ForeignKey("Admin")]
         public Guid AdminId { get; set; }
         public Admin Admin { get; set; }
+
         [ForeignKey("TargetUser")]
-        public Guid TargetUserId { get; set; }
-        public Customer TargetUser { get; set; }
+        public Guid TargetCustomerId { get; set; }
+        public User TargetCustomer { get; set; }
         public AdminActionType ActionType { get; set; }
         public DateTime Timestamp { get; set; }
     }
 
     public class Warn : AdminAction
     {
-        public string Reason { get; set; }
-
+        public string? Reason { get; set; }
         public int Severity { get; set; } // 1-3
     }
 

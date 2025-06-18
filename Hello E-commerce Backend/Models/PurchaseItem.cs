@@ -19,8 +19,5 @@ namespace E_commerce_Admin_Dashboard.Models
         public Product Product { get; set; }
 
         public int Quantity { get; set; }
-
-        public decimal UnitPrice { get; set; }
-
     }
 }
