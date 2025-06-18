@@ -41,7 +41,7 @@ namespace E_commerce_Admin_Dashboard.Mappers
             };
         }
 
-        public AdminResponse ToAdminLoginResponse(User user, Admin admin)
+        public AdminResponse ToAdminResponse(User user, Admin admin)
         {
             return new AdminResponse
             {
@@ -52,7 +52,8 @@ namespace E_commerce_Admin_Dashboard.Mappers
                 Name = admin.Name,
                 PhoneNumber = admin.PhoneNumber,
                 IsSuperAdmin = admin.IsSuperAdmin,
-                CreatedAt = admin.CreatedAt
+                CreatedAt = admin.CreatedAt,
+                UpdatedAt = admin.UpdatedAt,
             };
         }
     }

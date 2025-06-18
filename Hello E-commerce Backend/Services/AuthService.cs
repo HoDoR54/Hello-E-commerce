@@ -56,7 +56,7 @@ namespace Services
             if (!_passwordHasher.Verify(request.Password, user.Password))
                 return ServiceResult<AdminResponse>.Fail("Incorrect password.", 401);
 
-            var response = _adminMapper.ToAdminLoginResponse(user, admin);
+            var response = _adminMapper.ToAdminResponse(user, admin);
             return ServiceResult<AdminResponse>.Success(response, 200);
         }
 
@@ -131,7 +131,9 @@ namespace Services
 
             RefreshToken? matchedToken = await _userRepo.GetRefreshTokenAsync(refreshToken);
             if (matchedToken == null) return ServiceResult<string>.Fail("Inavlid refresh token.", 400);
-            string email = matchedToken.User.Email;
+            var matchedUser = await _userRepo.GetUserByIdAsync(matchedToken.UserId);
+            if (matchedUser == null) return ServiceResult<string>.Fail("No user found.", 404);
+            var email = matchedUser?.Email;
             var newAccessToken = await GenerateTokenAsync(email, TokenType.Access);
             if (!newAccessToken.OK)
                 return ServiceResult<string>.Fail(newAccessToken.ErrorMessage, newAccessToken.StatusCode);
@@ -175,7 +177,7 @@ namespace Services
 
         public async Task<ServiceResult<RefreshToken>> AddNewRefreshTokenAsync(string refreshToken)
         {
-            var userId = _jwtHelper.GetUserIdByToken(refreshToken);
+            var userId = _jwtHelper.GetUserIdByTokenAsync(refreshToken);
             var tokenModel = _generalMapper.RefreshTokenStringToModel(refreshToken, userId);
             var repoResult = await _authRepo.AddNewRefreshToken(tokenModel);
             if (repoResult == null) return ServiceResult<RefreshToken>.Fail("Adding the token failed.", 500);

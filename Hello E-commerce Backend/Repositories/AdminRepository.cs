@@ -1,6 +1,9 @@
-﻿using E_commerce_Admin_Dashboard.Interfaces.Repos;
+﻿using E_commerce_Admin_Dashboard.DTO.Responses.Admins;
+using E_commerce_Admin_Dashboard.Helpers;
+using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace E_commerce_Admin_Dashboard.Repositories
 {
@@ -17,6 +20,15 @@ namespace E_commerce_Admin_Dashboard.Repositories
             var entry = await _context.Admins.AddAsync(admin);
             await _context.SaveChangesAsync();
             return entry.Entity;
+        }
+
+        public async Task<Admin?> DeleteAdminByIdAsync(Guid id)
+        {
+            var matchedAdmin = await _context.Admins.FindAsync(id);
+            if (matchedAdmin == null) return null;
+            matchedAdmin.IsDeleted = true;            
+            await _context.SaveChangesAsync();
+            return await _context.Admins.FindAsync(id);
         }
 
         public async Task<Admin?> GetAdminByIdAsync(Guid id)
@@ -50,5 +62,46 @@ namespace E_commerce_Admin_Dashboard.Repositories
             return await query.ToListAsync();
         }
 
+        public async Task<string?> UpdateNameAsync(Guid id, string name)
+        {
+            var admin = await _context.Admins.FirstOrDefaultAsync(a => a.Id == id);
+            if (admin == null) return null;
+
+            admin.Name = name;
+            await _context.SaveChangesAsync();
+            return admin.Name;
+        }
+
+        public async Task<string?> UpdatePhoneNumAsync(Guid id, string phoneNumber)
+        {
+            var admin = await _context.Admins.FirstOrDefaultAsync(a => a.Id == id);
+            if (admin == null) return null;
+
+            admin.PhoneNumber = phoneNumber;
+            await _context.SaveChangesAsync();
+            return admin.PhoneNumber;
+        }
+
+        public async Task<Admin?> PromoteAdminAsync (Guid id)
+        {
+            var admin = await _context.Admins.FindAsync(id);
+            if (admin == null) return null;
+
+            if (admin.IsSuperAdmin) return null;
+            admin.IsSuperAdmin = true;
+            await _context.SaveChangesAsync();
+            return admin;
+        }
+
+        public async Task<Admin?> DemoteAdminAsync(Guid id)
+        {
+            var admin = await _context.Admins.FindAsync(id);
+            if (admin == null) return null;
+
+            if (!admin.IsSuperAdmin) return null;
+            admin.IsSuperAdmin = false;
+            await _context.SaveChangesAsync();
+            return admin;
+        }
     }
 }

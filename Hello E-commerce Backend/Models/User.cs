@@ -36,6 +36,7 @@ namespace E_commerce_Admin_Dashboard.Models
 
         public bool IsBanned { get; set; } = false;
         public int? BannedDays { get; set; }
+
         public Admin AdminProfile { get; set; }
         public Customer CustomerProfile { get; set; }
     }

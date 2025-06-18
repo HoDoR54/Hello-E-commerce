@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_commerce_Admin_Dashboard.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250613165721_AddIsDeletedAttributeToUserModel")]
+    partial class AddIsDeletedAttributeToUserModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,10 +97,7 @@ namespace E_commerce_Admin_Dashboard.Migrations
                     b.Property<Guid>("AdminId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TargetCustomerId")
+                    b.Property<Guid>("TargetUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Timestamp")
@@ -107,9 +107,7 @@ namespace E_commerce_Admin_Dashboard.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("TargetCustomerId");
+                    b.HasIndex("TargetUserId");
 
                     b.ToTable("AdminActions");
 
@@ -173,13 +171,28 @@ namespace E_commerce_Admin_Dashboard.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("BannedDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsBanned")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsWarned")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
@@ -204,6 +217,11 @@ namespace E_commerce_Admin_Dashboard.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("WarningLevel")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.HasKey("Id");
 
@@ -434,6 +452,9 @@ namespace E_commerce_Admin_Dashboard.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
@@ -480,11 +501,6 @@ namespace E_commerce_Admin_Dashboard.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("BannedDays")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -492,19 +508,6 @@ namespace E_commerce_Admin_Dashboard.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("IsBanned")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsWarned")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -520,11 +523,6 @@ namespace E_commerce_Admin_Dashboard.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("WarningLevel")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
@@ -538,9 +536,6 @@ namespace E_commerce_Admin_Dashboard.Migrations
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                             CreatedAt = new DateTime(2025, 5, 21, 12, 0, 0, 0, DateTimeKind.Utc),
                             Email = "hponetaukyou@gmail.com",
-                            IsBanned = false,
-                            IsDeleted = false,
-                            IsWarned = false,
                             IsDeleted = false,
                             Password = "$2a$12$90UrUp1k5/Zmzx9b3Ms8YunIR5.zexGCRLj3G/ztUVzFUpQpFAC7.",
                             Role = 0,
@@ -567,6 +562,7 @@ namespace E_commerce_Admin_Dashboard.Migrations
                     b.HasBaseType("E_commerce_Admin_Dashboard.Models.AdminAction");
 
                     b.Property<string>("Reason")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Severity")
@@ -599,6 +595,7 @@ namespace E_commerce_Admin_Dashboard.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Reason")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
@@ -640,19 +637,15 @@ namespace E_commerce_Admin_Dashboard.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("E_commerce_Admin_Dashboard.Models.Customer", null)
+                    b.HasOne("E_commerce_Admin_Dashboard.Models.Customer", "TargetUser")
                         .WithMany("AdminActions")
-                        .HasForeignKey("CustomerId");
-
-                    b.HasOne("E_commerce_Admin_Dashboard.Models.User", "TargetCustomer")
-                        .WithMany()
-                        .HasForeignKey("TargetCustomerId")
+                        .HasForeignKey("TargetUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Admin");
 
-                    b.Navigation("TargetCustomer");
+                    b.Navigation("TargetUser");
                 });
 
             modelBuilder.Entity("E_commerce_Admin_Dashboard.Models.Cart", b =>
