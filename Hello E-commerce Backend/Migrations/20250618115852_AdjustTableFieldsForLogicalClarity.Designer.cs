@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_commerce_Admin_Dashboard.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250618115852_AdjustTableFieldsForLogicalClarity")]
+    partial class AdjustTableFieldsForLogicalClarity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -506,9 +509,6 @@ namespace E_commerce_Admin_Dashboard.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -541,7 +541,6 @@ namespace E_commerce_Admin_Dashboard.Migrations
                             IsBanned = false,
                             IsDeleted = false,
                             IsWarned = false,
-                            IsDeleted = false,
                             Password = "$2a$12$90UrUp1k5/Zmzx9b3Ms8YunIR5.zexGCRLj3G/ztUVzFUpQpFAC7.",
                             Role = 0,
                             UpdatedAt = new DateTime(2025, 5, 21, 12, 0, 0, 0, DateTimeKind.Utc)
