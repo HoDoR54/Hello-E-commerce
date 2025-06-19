@@ -1,16 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "../styles/globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import ProtectionProvider from "../providers/ProtectionProvider";
 
 export const metadata: Metadata = {
   title: "Hello E-commerce Admin Panel",
@@ -24,9 +14,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`antialiased bg-blue-950 text-gray-100 flex items-center justify-center min-w-screen min-h-screen`}
       >
-        {children}
+        <ProtectionProvider>{children}</ProtectionProvider>
       </body>
     </html>
   );
