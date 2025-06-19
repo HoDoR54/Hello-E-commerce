@@ -1,3 +1,7 @@
 export default function Home() {
-  return <div>Hello World!</div>;
+  return (
+    <main>
+      <section>Welcome to the Protected Dashboard!</section>
+    </main>
+  );
 }
