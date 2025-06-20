@@ -15,12 +15,6 @@
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        public bool IsWarned { get; set; }
-        public int? WarningLevel { get; set; }
-
-        public bool IsBanned { get; set; }
-        public int? BannedDays { get; set; }
-
         public int LoyaltyPoints { get; set; }
     }
 }

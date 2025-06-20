@@ -85,16 +85,19 @@ public class CustomerMapper : ICustomerMapper
         };
     }
 
-    public CustomerRessponse CustomerRegisterModelsToResponse(User user, Customer customer, CustomerAddress address)
+    public  CustomerResponse CustomerRegisterModelsToResponse(User user, Customer customer, CustomerAddress address)
     {
-        return new CustomerRessponse
+        return new CustomerResponse
         {
             UserId = user.Id,
             Email = user.Email,
+            CustomerId = customer.Id,
             Name = customer.Name,
             PhoneNumber = customer.PhoneNumber,
             DateOfBirth = customer.DateOfBirth,
-            CustomerAddress = CustomerAddressModelToResponse(address),
+            CreatedAt = customer.CreatedAt,
+            UpdatedAt = customer.UpdatedAt,
+            LoyaltyPoints= customer.LoyaltyPoints,
         };
     }
 
