@@ -1,7 +1,8 @@
 import { Truculenta } from "next/font/google";
-import { AdminResponse } from "../types/auth.types";
+import { AdminResponse, LoginRequest } from "../types/auth.types";
 import { FetchResponse } from "../types/general.types";
 import axios from "axios";
+import helloAxios from "../lib/helloAxios";
 
 export const registerUser = () => {};
 
@@ -24,6 +25,15 @@ export const authenticate = async (): Promise<FetchResponse<AdminResponse>> => {
   };
 };
 
-// export const loginAdmin = async (): Promise<FetchResponse<AdminResponse>> => {
-
-// }
+export const loginAsync = async (
+  url: string,
+  { arg }: { arg: LoginRequest }
+) => {
+  try {
+    const res = await helloAxios.post<FetchResponse<AdminResponse>>(url, arg);
+    console.log(res.data.ok && res.data.data);
+    return res.data.ok ? res.data.data : res.data.errorMessage;
+  } catch (error: any) {
+    throw error;
+  }
+};
