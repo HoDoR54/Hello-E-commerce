@@ -1,8 +1,8 @@
 "use client";
 
 import React, { ReactNode, useState } from "react";
-import InputField from "./InputField";
-import Button from "./Button";
+import InputField from "./input-field";
+import Button from "./button";
 import Link from "next/link";
 
 type InputType = "text" | "email" | "password" | "number";
@@ -48,7 +48,7 @@ const Form: React.FC<FormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`rounded-2xl shadow-xs bg-primary-light flex flex-col gap-4 p-4 bg-gray-100 shadow-black text-gray-950 ${additionalStyling}`}
+      className={`rounded-2xl shadow-xs bg-primary-light flex flex-col gap-4 py-4 px-6 bg-gray-100 shadow-black text-gray-950 ${additionalStyling}`}
     >
       <h2 className="text-xl font-semibold w-full flex items-center justify-center">
         {titleText}
