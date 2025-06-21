@@ -1,24 +1,34 @@
 "use client";
 
 import React from "react";
-import Form from "../../../components/UI/Form";
+import Form from "../../../components/UI/form";
 import { loginAsync } from "../../../services/services.auth";
+import { useRouter } from "next/navigation";
+import useUserSessionStore from "../../../store/useUserSessionStore";
 
-const handleLogin = async (data: Record<string, string>) => {
-  try {
-    const loginRequest = {
-      email: data.email,
-      password: data.password,
-    };
-    const result = await loginAsync("/auth/admins/login", {
-      arg: loginRequest,
-    });
-    console.log("Login success:", result);
-  } catch (error) {
-    console.error("Login failed:", error);
-  }
-};
 const LoginPage = () => {
+  const router = useRouter();
+  const setCurrentUser = useUserSessionStore((state) => state.setCurrentUser);
+
+  const handleLogin = async (data: Record<string, string>) => {
+    try {
+      const loginRequest = {
+        email: data.email,
+        password: data.password,
+      };
+      const result = await loginAsync("/auth/admins/login", {
+        arg: loginRequest,
+      });
+      if (result) {
+        setCurrentUser(result);
+      }
+      router.push("/");
+      console.log("Login success:", result);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
+
   return (
     <main>
       <Form

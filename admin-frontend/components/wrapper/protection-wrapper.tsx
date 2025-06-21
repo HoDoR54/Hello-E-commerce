@@ -2,19 +2,16 @@
 
 import React, { useEffect, useState, ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { authenticate } from "../services/services.auth";
-import { FetchResponse } from "../types/general.types";
-import { AdminResponse } from "../types/auth.types";
+import { FetchResponse } from "../../types/general.types";
+import { AdminResponse } from "../../types/auth.types";
 
-interface ProtectionProviderProps {
+interface ProtectionWrapperProps {
   children: ReactNode;
 }
 
-const ProtectionProvider: React.FC<ProtectionProviderProps> = ({
-  children,
-}) => {
+const ProtectionWrapper: React.FC<ProtectionWrapperProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -31,15 +28,11 @@ const ProtectionProvider: React.FC<ProtectionProviderProps> = ({
       }
 
       try {
-        const result: FetchResponse<AdminResponse> = await authenticate();
-        if (isMounted) {
-          if (result.ok) {
-            setIsLoggedIn(true);
-          } else {
-            router.replace("/login");
-            console.log("redirected.");
-          }
-          setIsLoading(false);
+        const result = localStorage.getItem("isLoggedIn");
+        if (result && JSON.parse(result) === true) {
+          setIsLoggedIn(true);
+        } else {
+          router.replace("/login");
         }
       } catch (error) {
         console.error("Authentication failed:", error);
@@ -66,4 +59,4 @@ const ProtectionProvider: React.FC<ProtectionProviderProps> = ({
   return <>{isLoggedIn ? children : null}</>;
 };
 
-export default ProtectionProvider;
+export default ProtectionWrapper;

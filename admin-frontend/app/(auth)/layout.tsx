@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import AuthFooter from "../../components/layout/AuthFooter";
+import AuthFooter from "../../components/layout/auth-footer";
 
 interface LoginLayoutProps {
   children: ReactNode;
