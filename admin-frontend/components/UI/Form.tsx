@@ -2,8 +2,9 @@
 
 import React, { ReactNode, useState } from "react";
 import InputField from "./input-field";
-import Button from "./button";
 import Link from "next/link";
+import Button from "./button";
+import { LoginRequest } from "../../types/auth.types";
 
 type InputType = "text" | "email" | "password" | "number";
 
@@ -17,7 +18,7 @@ export interface FieldConfig {
 interface FormProps {
   titleText: string;
   fields: FieldConfig[];
-  onSubmit: (data: Record<string, string>) => void;
+  onSubmit: (data: LoginRequest) => void;
   additionalStyling?: string;
   link?: string;
   linkLabel?: string;
@@ -42,7 +43,11 @@ const Form: React.FC<FormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    const req: LoginRequest = {
+      email: formData["email"],
+      password: formData["password"],
+    };
+    onSubmit(req);
   };
 
   return (

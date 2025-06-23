@@ -1,5 +1,6 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Requests.Admins;
 using E_commerce_Admin_Dashboard.DTO.Responses.Admins;
+using E_commerce_Admin_Dashboard.Interfaces.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Mappers;
 using E_commerce_Admin_Dashboard.Models;
 
@@ -7,6 +8,11 @@ namespace E_commerce_Admin_Dashboard.Mappers
 {
     public class AdminMapper : IAdminMapper
     {
+        private readonly IPasswordHasher _passwordHasher;
+        public AdminMapper (IPasswordHasher pwHashwer)
+        {
+            _passwordHasher = pwHashwer;
+        }
         public Admin CreateAdminRequestToAdminModel(CreateAdminRequest request, User user, Admin superAdmin)
         {
             return new Admin
@@ -31,7 +37,7 @@ namespace E_commerce_Admin_Dashboard.Mappers
             {
                 Id = Guid.NewGuid(),
                 Email = request.Email,
-                Password = "temporaryPasswordForAdmins123!@#",
+                Password = _passwordHasher.Hash("temporaryPasswordForAdmins123!@#"),
                 Role = UserRole.Admin,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
