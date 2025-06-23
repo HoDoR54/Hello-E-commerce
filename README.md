@@ -10,7 +10,6 @@ A full-stack POS project I’m building. Still under development but I'm aiming 
 - ⚡ Server-Side Rendering (SSR) for better SEO and faster page loads  
 - 🚦 Rate limiting (planning to add for sensitive stuff)  
 - 🌈 Dark mode and light mode support  
-- ♻️ Reusable components and layout system  
 - ⏳ Loading skeletons for smoother feel  
 - 🌍 Ready for multiple languages (not done yet)
 
