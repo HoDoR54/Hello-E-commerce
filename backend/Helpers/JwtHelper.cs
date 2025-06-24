@@ -86,7 +86,7 @@ namespace E_commerce_Admin_Dashboard.Helpers
             return ServiceResult<string>.Success(token, 200);
         }
 
-        public Guid GetUserIdByTokenAsync(string token)
+        public Guid GetUserIdByToken(string token)
         {
             var jwt = _jwtHandler.ReadJwtToken(token);
             var userIdString = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;

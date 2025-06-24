@@ -1,6 +1,7 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Requests.Admins;
 using E_commerce_Admin_Dashboard.Interfaces.Repos;
 using E_commerce_Admin_Dashboard.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.MicrosoftExtensions;
@@ -19,7 +20,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
             _adminService = adminService;
         }
 
-        // Get all admins (can be done by super admins only)
+        [Authorize(Policy = "SuperAdminOnly")]
         [HttpGet]
         public async Task<IActionResult> GetAllAdminAsync(
             [FromQuery] string? search,
@@ -29,9 +30,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
         {
             var token = Request.Cookies["access_token"];
 
-            if (token == null) return Unauthorized("Token missing.");
-
-            var serviceResponse = await _adminService.GetAllAdminsAsync(token, search, limit, page, sort);
+            var serviceResponse = await _adminService.GetAllAdminsAsync(search, limit, page, sort);
 
             if (!serviceResponse.OK)
                 return StatusCode(serviceResponse.StatusCode, serviceResponse);
@@ -40,13 +39,14 @@ namespace E_commerce_Admin_Dashboard.Controllers
         }
 
         // Create a new admin
+        [Authorize(Policy = "SuperAdminOnly")]
         [HttpPost]
         public async Task<IActionResult> CreateAdminAsync([FromBody] CreateAdminRequest req)
         {
             var token = Request.Cookies["access_token"];
             if (token == null) return Unauthorized("Token missing.");
 
-            var serviceResponse = await _adminService.CreateNewAdminAsync(token, req);
+            var serviceResponse = await _adminService.CreateNewAdminAsync(req);
 
             if (!serviceResponse.OK)
                 return StatusCode(serviceResponse.StatusCode, serviceResponse);
@@ -61,7 +61,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
             var token = Request.Cookies["access_token"];
             if (token == null) return Unauthorized("Token missing.");
 
-            var serviceResponse = await _adminService.GetAdminByIdAsync(token, id);
+            var serviceResponse = await _adminService.GetAdminByIdAsync(id);
             if (!serviceResponse.OK)
                 return StatusCode(serviceResponse.StatusCode, serviceResponse);
 
@@ -79,6 +79,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
         }
 
         // Delete admin by Id
+        [Authorize(Policy = "SuperAdminOnly")]
         [HttpPatch("soft-delete/{id}")]
         public async Task<IActionResult> DeleteAdminByIdAsync([FromRoute] Guid id)
         {
@@ -89,25 +90,27 @@ namespace E_commerce_Admin_Dashboard.Controllers
         }
 
         // Promote the admin to super admin
+        [Authorize(Policy = "SuperAdminOnly")]
         [HttpPatch("promote/{id}")]
         public async Task<IActionResult> PromoteToSuperAdminAsync([FromRoute] Guid id)
         {
             var token = Request.Cookies["access_token"];
             if (token == null) return Unauthorized("Missing token.");
 
-            var serviceResult = await _adminService.PromoteAdminAsync(token, id);
+            var serviceResult = await _adminService.PromoteAdminAsync(id);
             if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, serviceResult);
 
             return Ok(serviceResult);
         }
 
+        [Authorize(Policy = "SuperAdminOnly")]
         [HttpPatch("demote/{id}")]
         public async Task<IActionResult> DemoteFromSuperAdminAsync([FromRoute] Guid id)
         {
             var token = Request.Cookies["access_token"];
             if (token == null) return Unauthorized("Missing token.");
 
-            var serviceResult = await _adminService.DemoteAdminAsync(token, id);
+            var serviceResult = await _adminService.DemoteAdminAsync(id);
             if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, serviceResult);
 
             return Ok(serviceResult);

@@ -181,19 +181,6 @@ namespace Services
 
             return ServiceResult<CreateAdminRequest>.Success(req, 200);
         }
-
-        public async Task<ServiceResult<Admin>> ValidateAndReturnSuperAdminAsync(Guid UserId)
-        {
-            var matchedUser = await _userRepo.GetUserByIdAsync(UserId);
-            if (matchedUser == null) return ServiceResult<Admin>.Fail("No user found", 404);
-
-            var matchedAdmin = await _adminRepo.GetAdminByUserIdAsync(matchedUser.Id);
-            if (matchedAdmin == null) return ServiceResult<Admin>.Fail("No admin found.", 404);
-
-            if (!matchedAdmin.IsSuperAdmin) return ServiceResult<Admin>.Fail("User is not a super admin.", 401);
-
-            return ServiceResult<Admin>.Success(matchedAdmin, 200);
-        }
     }
 
 }
