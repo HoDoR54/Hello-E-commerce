@@ -15,7 +15,5 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Services
         ServiceResult<string> ValidatePhoneNumber(string phoneNumber);
         ServiceResult<CustomerAddressCreateRequest> ValidateAddress(CustomerAddressCreateRequest address);
         CustomerAddress ReformatAddress(CustomerAddress address);
-
-        Task<ServiceResult<Admin>> ValidateAndReturnSuperAdminAsync (Guid superAdminId);
     }
 }

@@ -7,7 +7,7 @@ namespace E_commerce_Admin_Dashboard.Models
     public enum UserRole
     {
         Admin,
-        Customer
+        Customer,
     }
 
     public class User

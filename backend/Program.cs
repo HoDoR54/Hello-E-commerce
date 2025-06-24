@@ -7,6 +7,7 @@ using E_commerce_Admin_Dashboard.Mappers;
 using E_commerce_Admin_Dashboard.Repositories;
 using E_commerce_Admin_Dashboard.Services;
 using Microsoft.EntityFrameworkCore;
+using E_commerce_Admin_Dashboard.Middlewares;
 using Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,6 +55,14 @@ builder.Services.AddScoped<ICustomerMapper, CustomerMapper>();
 builder.Services.AddScoped<IAdminMapper, AdminMapper>();
 builder.Services.AddScoped<IGeneralMapper, GeneralMapper>();
 
+builder.Services.AddScoped<AccessTokenValidator>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("SuperAdminOnly", policy =>
+        policy.RequireRole("super_admin"));
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -66,6 +75,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontend");
+
+app.UseMiddleware<AccessTokenValidator>();
 
 app.UseAuthorization();
 

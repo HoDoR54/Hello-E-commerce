@@ -73,37 +73,14 @@ namespace E_commerce_Admin_Dashboard.Controllers
             return StatusCode(registerResult.StatusCode, registerResult);
         }
 
-        [HttpPost("authenticate")]
-        public async Task<IActionResult> AuthenticateToken()
-        {
-            var accessToken = Request.Cookies["access_token"];
-            var refreshToken = Request.Cookies["refresh_token"];
-
-            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
-            {
-                return StatusCode(401, ServiceResult<object?>.Fail("No token found in the request.", 401));
-            }
-
-            var refreshCheck = await _authServices.ValidateTokenAsync(refreshToken, TokenType.Refresh);
-            if (!refreshCheck.OK)
-                return StatusCode(refreshCheck.StatusCode, refreshCheck);
-
-            var accessCheck = await _authServices.ValidateTokenAsync(accessToken, TokenType.Access);
-            if (!accessCheck.OK)
-                return StatusCode(accessCheck.StatusCode, accessCheck);
-
-            return StatusCode(200, ServiceResult<string>.Success("Token authentication successful.", 200));
-        }
-
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshAccessToken()
         {
             var refreshToken = Request.Cookies["refresh_token"];
-            var accessToken = Request.Cookies["access_token"];
 
-            if (string.IsNullOrEmpty(refreshToken) || string.IsNullOrEmpty(accessToken))
+            if (string.IsNullOrEmpty(refreshToken))
             {
-                return StatusCode(401, ServiceResult<object?>.Fail("No token found in the request.", 401));
+                return StatusCode(401, ServiceResult<object?>.Fail("No refresh token found in the request.", 401));
             }
 
             var refreshCheck = await _authServices.ValidateTokenAsync(refreshToken, TokenType.Refresh);

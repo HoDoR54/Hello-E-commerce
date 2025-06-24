@@ -10,6 +10,6 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Helpers
 
         Task<ServiceResult<string>> ValidateTokenAsync (string token, TokenType tokenType);
 
-        Guid GetUserIdByTokenAsync (string token);
+        Guid GetUserIdByToken (string token);
     }
 }
