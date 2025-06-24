@@ -177,7 +177,7 @@ namespace Services
 
         public async Task<ServiceResult<RefreshToken>> AddNewRefreshTokenAsync(string refreshToken)
         {
-            var userId = _jwtHelper.GetUserIdByTokenAsync(refreshToken);
+            var userId = _jwtHelper.GetUserIdByToken(refreshToken);
             var tokenModel = _generalMapper.RefreshTokenStringToModel(refreshToken, userId);
             var repoResult = await _authRepo.AddNewRefreshToken(tokenModel);
             if (repoResult == null) return ServiceResult<RefreshToken>.Fail("Adding the token failed.", 500);
