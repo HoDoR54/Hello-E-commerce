@@ -1,3 +1,5 @@
+import { UserRole } from "./general.types";
+
 export type LoginRequest = {
   email: string;
   password: string;
@@ -13,3 +15,18 @@ export type AdminResponse = {
   createdAt: string;
   updatedAt: string;
 };
+
+export interface UserResponse {
+  id: string;
+  email: string;
+  role: UserRole;
+
+  isWarned: boolean;
+  warningLevel?: number | null;
+
+  isBanned: boolean;
+  bannedDays?: number | null;
+
+  createdAt: string;
+  updatedAt: string;
+}

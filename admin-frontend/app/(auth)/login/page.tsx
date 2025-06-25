@@ -11,7 +11,7 @@ import { AdminResponse, LoginRequest } from "../../../types/auth.types";
 const LoginPage = () => {
   const router = useRouter();
   const setCurrentUser = useUserSessionStore((state) => state.setCurrentUser);
-  const { trigger: login, data, error, isMutating } = useLoginAsync();
+  const { trigger: login } = useLoginAsync();
 
   const handleLogin = async (data: LoginRequest) => {
     if (!data.email?.trim() || !data.password?.trim()) {

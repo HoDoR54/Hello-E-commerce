@@ -4,3 +4,8 @@ export type FetchResponse<T> = {
   errorMessage?: string;
   data?: T;
 };
+
+export enum UserRole {
+  Admin = "Admin",
+  Customer = "Customer",
+}
