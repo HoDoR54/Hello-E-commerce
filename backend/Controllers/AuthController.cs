@@ -22,27 +22,10 @@ namespace E_commerce_Admin_Dashboard.Controllers
             _cookiesHelper = cookiesHelper;
         }
 
-        [HttpPost("admins/login")]
+        [HttpPost("login")]
         public async Task<IActionResult> AdminLogin([FromBody] LoginRequest request)
         {
-            var loginResult = await _authServices.LoginAsAdminAsync(request);
-            if (!loginResult.OK)
-                return StatusCode(loginResult.StatusCode, loginResult);
-
-            var tokenResult = await _authServices.GenerateTokenPairAsync(request.Email);
-            if (!tokenResult.OK)
-                return StatusCode(tokenResult.StatusCode, tokenResult);
-
-            _cookiesHelper.SetRefreshTokenCookies(Response, tokenResult.Data.RefreshToken);
-            _cookiesHelper.SetAccessTokenCookies(Response, tokenResult.Data.AccessToken);
-
-            return StatusCode(loginResult.StatusCode, loginResult);
-        }
-
-        [HttpPost("customers/login")]
-        public async Task<IActionResult> CustomerLogin([FromBody] LoginRequest request)
-        {
-            var loginResult = await _authServices.LoginAsCustomerAsync(request);
+            var loginResult = await _authServices.LoginAsync(request);
             if (!loginResult.OK)
                 return StatusCode(loginResult.StatusCode, loginResult);
 
@@ -73,15 +56,32 @@ namespace E_commerce_Admin_Dashboard.Controllers
             return StatusCode(registerResult.StatusCode, registerResult);
         }
 
+        [HttpPost("authenticate")]
+        public async Task<IActionResult> AuthenticateAsync()
+        {
+            var accessToken = Request.Cookies["access_token"];
+            if (accessToken == null)
+                return Unauthorized(ServiceResult<object>.Fail("No access token found.", 401));
+
+            var validationResult = await _authServices.ValidateTokenAsync(accessToken, TokenType.Access);
+            if (!validationResult.OK)
+                return StatusCode(validationResult.StatusCode, validationResult);
+
+            var response = await _authServices.GetUserByTokenAsync(accessToken);
+            if (!response.OK)
+                return StatusCode(response.StatusCode, response);
+
+            return StatusCode(response.StatusCode, response);
+        }
+
         [HttpPost("refresh")]
-        public async Task<IActionResult> RefreshAccessToken()
+        public async Task<IActionResult> RefreshAccessTokenAsync()
         {
             var refreshToken = Request.Cookies["refresh_token"];
-            var accessToken = Request.Cookies["access_token"];
 
-            if (string.IsNullOrEmpty(refreshToken) || string.IsNullOrEmpty(accessToken))
+            if (string.IsNullOrEmpty(refreshToken))
             {
-                return StatusCode(401, ServiceResult<object?>.Fail("No token found in the request.", 401));
+                return StatusCode(401, ServiceResult<object?>.Fail("No refresh token found in the request.", 401));
             }
 
             var refreshCheck = await _authServices.ValidateTokenAsync(refreshToken, TokenType.Refresh);

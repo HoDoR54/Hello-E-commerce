@@ -7,10 +7,11 @@ const helloAxios = axios.create({
     Accept: "application/json",
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 helloAxios.interceptors.request.use((config) => {
-  const token = Cookies.get("accessToken");
+  const token = Cookies.get("access_token");
   if (token && config.headers) {
     config.headers["Authorization"] = `Bearer ${token}`;
   }

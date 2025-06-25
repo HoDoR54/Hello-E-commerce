@@ -15,13 +15,13 @@ export default function Home() {
         {currentUser ? (
           <div className="space-y-2 text-gray-700">
             <p>
-              <strong>User ID:</strong> {currentUser.userId}
+              <strong>User ID:</strong> {currentUser.id}
             </p>
             <p>
-              <strong>Admin ID:</strong> {currentUser.adminId}
+              <strong>Email:</strong> {currentUser.email}
             </p>
             <p>
-              <strong>Name:</strong> {currentUser.name}
+              <strong>Role:</strong> {currentUser.role.toString()}
             </p>
             <p>
               <strong>Created At:</strong>{" "}

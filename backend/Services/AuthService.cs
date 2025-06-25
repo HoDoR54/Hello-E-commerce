@@ -45,34 +45,26 @@ namespace Services
             _generalMapper = generalMapper;
         }
 
-        public async Task<ServiceResult<AdminResponse>> LoginAsAdminAsync(LoginRequest request)
+        public async Task<ServiceResult<UserResponse>> LoginAsync(LoginRequest request)
         {
             var user = await _authRepo.GetUserByEmailAsync(request.Email);
-            if (user == null) return ServiceResult<AdminResponse>.Fail("User not found.", 404);
+            if (user == null) return ServiceResult<UserResponse>.Fail("User not found.", 404);
 
-            var admin = await _authRepo.GetAdminByUserIdAsync(user.Id);
-            if (admin == null) return ServiceResult<AdminResponse>.Fail("User is not an admin.", 404);
-
-            if (!_passwordHasher.Verify(request.Password, user.Password))
-                return ServiceResult<AdminResponse>.Fail("Incorrect password.", 401);
-
-            var response = _adminMapper.ToAdminResponse(user, admin);
-            return ServiceResult<AdminResponse>.Success(response, 200);
-        }
-
-        public async Task<ServiceResult<CustomerResponse>> LoginAsCustomerAsync(LoginRequest request)
-        {
-            var user = await _authRepo.GetUserByEmailAsync(request.Email);
-            if (user == null) return ServiceResult<CustomerResponse>.Fail("User not found.", 404);
-
-            var customer = await _authRepo.GetCustomerByUserIdAsync(user.Id);
-            if (customer == null) return ServiceResult<CustomerResponse>.Fail("User is not a customer.", 404);
+            if (user.Role == UserRole.Admin)
+            {
+                var admin = await _authRepo.GetAdminByUserIdAsync(user.Id);
+                if (admin == null) return ServiceResult<UserResponse>.Fail("No admin record found.", 404);
+            } else if (user.Role == UserRole.Customer)
+            {
+                var customer = await _authRepo.GetCustomerByUserIdAsync(user.Id);
+                if (customer == null) return ServiceResult<UserResponse>.Fail("User is not a customer.", 404);
+            }
 
             if (!_passwordHasher.Verify(request.Password, user.Password))
-                return ServiceResult<CustomerResponse>.Fail("Incorrect password.", 401);
+                return ServiceResult<UserResponse>.Fail("Incorrect password.", 401);
 
-            var response = _customerMapper.ToCustomerLoginResponse(user, customer);
-            return ServiceResult<CustomerResponse>.Success(response, 200);
+            var response = _generalMapper.UserModelToResponse(user);
+            return ServiceResult<UserResponse>.Success(response, 200);
         }
 
         public async Task<ServiceResult<CustomerResponse>> RegisterCustomerAsync(CustomerRegisterRequest request)
@@ -173,6 +165,17 @@ namespace Services
             return user == null
                 ? ServiceResult<User>.Fail("User not found.", 404)
                 : ServiceResult<User>.Success(user, 200);
+        }
+
+        public async Task<ServiceResult<UserResponse>> GetUserByTokenAsync (string token)
+        {
+            var userId = _jwtHelper.GetUserIdByToken(token);
+            var user = await _userRepo.GetUserByIdAsync(userId);
+            if (user == null) 
+                return ServiceResult<UserResponse>.Fail("No user found.", 404);
+            var mappedUser = _generalMapper.UserModelToResponse(user);
+            return ServiceResult<UserResponse>.Success(mappedUser, 200);
+            
         }
 
         public async Task<ServiceResult<RefreshToken>> AddNewRefreshTokenAsync(string refreshToken)

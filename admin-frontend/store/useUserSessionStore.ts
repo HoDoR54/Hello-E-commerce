@@ -1,32 +1,20 @@
 import { create } from "zustand";
-import { AdminResponse } from "../types/auth.types";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { UserResponse } from "../types/auth.types";
 
 interface UserSessionState {
-  currentUser: AdminResponse | null;
-  setCurrentUser: (payload: AdminResponse) => void;
+  currentUser: UserResponse | null;
+  setCurrentUser: (payload: UserResponse) => void;
   clearCurrentUser: () => void;
   hasHydrated: boolean;
   setHasHydrated: (payload: boolean) => void;
 }
 
-const useUserSessionStore = create<UserSessionState>()(
-  persist(
-    (set) => ({
-      currentUser: null,
-      setCurrentUser: (payload) => set({ currentUser: payload }),
-      clearCurrentUser: () => set({ currentUser: null }),
-      hasHydrated: false,
-      setHasHydrated: (payload: boolean) => set({ hasHydrated: payload }),
-    }),
-    {
-      name: "user-session",
-      storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-      },
-    }
-  )
-);
+const useUserSessionStore = create<UserSessionState>((set) => ({
+  currentUser: null,
+  setCurrentUser: (payload) => set({ currentUser: payload }),
+  clearCurrentUser: () => set({ currentUser: null }),
+  hasHydrated: false,
+  setHasHydrated: (payload: boolean) => set({ hasHydrated: payload }),
+}));
 
 export default useUserSessionStore;
