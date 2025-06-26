@@ -29,3 +29,15 @@ const authenticateAsync = async (url: string) => {
 
 export const useAuthenticateAsync = () =>
   useSWRMutation("auth/authenticate", authenticateAsync);
+
+const refreshAsync = async (url: string) => {
+  try {
+    const res = await helloAxios.post<FetchResponse<string>>(url);
+    return res.data.ok;
+  } catch (error: any) {
+    return error.response.data as FetchResponse<string>;
+  }
+};
+
+export const useRefreshAsync = () =>
+  useSWRMutation("auth/refresh", refreshAsync);
