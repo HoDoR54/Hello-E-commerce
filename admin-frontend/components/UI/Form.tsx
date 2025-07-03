@@ -1,87 +1,167 @@
-"use client";
+"use client"
 
-import React, { ReactNode, useState } from "react";
-import InputField from "./input-field";
-import Link from "next/link";
-import Button from "./button";
-import { LoginRequest } from "../../types/auth.types";
+import * as React from "react"
+import * as LabelPrimitive from "@radix-ui/react-label"
+import { Slot } from "@radix-ui/react-slot"
+import {
+  Controller,
+  FormProvider,
+  useFormContext,
+  useFormState,
+  type ControllerProps,
+  type FieldPath,
+  type FieldValues,
+} from "react-hook-form"
 
-type InputType = "text" | "email" | "password" | "number";
+import { cn } from "@/lib/utils"
+import { Label } from "@/components/ui/label"
 
-export interface FieldConfig {
-  name: string;
-  label: string;
-  type: InputType;
-  placeholder?: string;
+const Form = FormProvider
+
+type FormFieldContextValue<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> = {
+  name: TName
 }
 
-interface FormProps {
-  titleText: string;
-  fields: FieldConfig[];
-  onSubmit: (data: LoginRequest) => void;
-  additionalStyling?: string;
-  link?: string;
-  linkLabel?: string;
-  buttonLabel: string;
+const FormFieldContext = React.createContext<FormFieldContextValue>(
+  {} as FormFieldContextValue
+)
+
+const FormField = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  ...props
+}: ControllerProps<TFieldValues, TName>) => {
+  return (
+    <FormFieldContext.Provider value={{ name: props.name }}>
+      <Controller {...props} />
+    </FormFieldContext.Provider>
+  )
 }
 
-const Form: React.FC<FormProps> = ({
-  titleText,
-  fields,
-  onSubmit,
-  additionalStyling,
-  link,
-  linkLabel,
-  buttonLabel,
-}) => {
-  const [formData, setFormData] = useState<Record<string, string>>({});
+const useFormField = () => {
+  const fieldContext = React.useContext(FormFieldContext)
+  const itemContext = React.useContext(FormItemContext)
+  const { getFieldState } = useFormContext()
+  const formState = useFormState({ name: fieldContext.name })
+  const fieldState = getFieldState(fieldContext.name, formState)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  if (!fieldContext) {
+    throw new Error("useFormField should be used within <FormField>")
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const req: LoginRequest = {
-      email: formData["email"],
-      password: formData["password"],
-    };
-    onSubmit(req);
-  };
+  const { id } = itemContext
+
+  return {
+    id,
+    name: fieldContext.name,
+    formItemId: `${id}-form-item`,
+    formDescriptionId: `${id}-form-item-description`,
+    formMessageId: `${id}-form-item-message`,
+    ...fieldState,
+  }
+}
+
+type FormItemContextValue = {
+  id: string
+}
+
+const FormItemContext = React.createContext<FormItemContextValue>(
+  {} as FormItemContextValue
+)
+
+function FormItem({ className, ...props }: React.ComponentProps<"div">) {
+  const id = React.useId()
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={`rounded-2xl shadow-xs bg-primary-light flex flex-col gap-4 py-4 px-6 bg-gray-100 shadow-black text-gray-950 ${additionalStyling}`}
-    >
-      <h2 className="text-xl font-semibold w-full flex items-center justify-center">
-        {titleText}
-      </h2>
-      {fields.map((field) => (
-        <InputField
-          key={field.name}
-          {...field}
-          value={formData[field.name] || ""}
-          onChange={handleChange}
-        />
-      ))}
-      {link && (
-        <div className="w-full flex items-center justify-center">
-          <Link href={link} className="underline text-blue-800">
-            {linkLabel ? linkLabel : "Click here!"}
-          </Link>
-        </div>
-      )}
-      <Button
-        type="submit"
-        className="mt-auto py-2 px-4 rounded-lg hover:opacity-90 transition"
-        variant="primary"
-      >
-        {buttonLabel}
-      </Button>
-    </form>
-  );
-};
+    <FormItemContext.Provider value={{ id }}>
+      <div
+        data-slot="form-item"
+        className={cn("grid gap-2", className)}
+        {...props}
+      />
+    </FormItemContext.Provider>
+  )
+}
 
-export default Form;
+function FormLabel({
+  className,
+  ...props
+}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+  const { error, formItemId } = useFormField()
+
+  return (
+    <Label
+      data-slot="form-label"
+      data-error={!!error}
+      className={cn("data-[error=true]:text-destructive", className)}
+      htmlFor={formItemId}
+      {...props}
+    />
+  )
+}
+
+function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+
+  return (
+    <Slot
+      data-slot="form-control"
+      id={formItemId}
+      aria-describedby={
+        !error
+          ? `${formDescriptionId}`
+          : `${formDescriptionId} ${formMessageId}`
+      }
+      aria-invalid={!!error}
+      {...props}
+    />
+  )
+}
+
+function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
+  const { formDescriptionId } = useFormField()
+
+  return (
+    <p
+      data-slot="form-description"
+      id={formDescriptionId}
+      className={cn("text-muted-foreground text-sm", className)}
+      {...props}
+    />
+  )
+}
+
+function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
+  const { error, formMessageId } = useFormField()
+  const body = error ? String(error?.message ?? "") : props.children
+
+  if (!body) {
+    return null
+  }
+
+  return (
+    <p
+      data-slot="form-message"
+      id={formMessageId}
+      className={cn("text-destructive text-sm", className)}
+      {...props}
+    >
+      {body}
+    </p>
+  )
+}
+
+export {
+  useFormField,
+  Form,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+  FormField,
+}
