@@ -53,8 +53,9 @@ namespace E_commerce_Admin_Dashboard.Repositories
             query = sort?.ToLower() switch
             {
                 "name" => query.OrderBy(a => a.Name),
-                _ => query.OrderByDescending(a => a.CreatedAt)
+                _ => query
             };
+
 
             int skip = (page - 1) * limit;
             query = query.Skip(skip).Take(limit);
@@ -77,9 +78,12 @@ namespace E_commerce_Admin_Dashboard.Repositories
             var admin = await _context.Admins.FirstOrDefaultAsync(a => a.Id == id);
             if (admin == null) return null;
 
-            admin.PhoneNumber = phoneNumber;
+            var matchedUser = await _context.Users.FirstOrDefaultAsync(a => a.Id == admin.UserId);
+            if (matchedUser == null) return null;
+
+            matchedUser.PhoneNumber = phoneNumber;
             await _context.SaveChangesAsync();
-            return admin.PhoneNumber;
+            return matchedUser.PhoneNumber;
         }
 
         public async Task<Admin?> PromoteAdminAsync (Guid id)

@@ -12,6 +12,5 @@ namespace E_commerce_Admin_Dashboard.Interfaces.Services
         Task<ServiceResult<AdminResponse>> GetAdminByIdAsync(Guid id);
         Task<ServiceResult<List<AdminResponse>>> GetAllAdminsAsync(string? search, int limit, int page, string? sort);
         Task<ServiceResult<AdminResponse>> PromoteAdminAsync(Guid id);
-        Task<ServiceResult<AdminResponse>> UpdateAdminDetailsAsync(Guid id, UpdateAdminDetailsRequest req);
     }
 }

@@ -21,9 +21,6 @@ namespace E_commerce_Admin_Dashboard.Mappers
                 User = user,
                 UserId = user.Id,
                 Name = request.Name,
-                PhoneNumber = request.PhoneNumber,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
                 IsDeleted = false,
                 IsSuperAdmin = false,
                 CreatedBy = superAdmin.Id,
@@ -39,6 +36,7 @@ namespace E_commerce_Admin_Dashboard.Mappers
                 Email = request.Email,
                 Password = _passwordHasher.Hash("temporaryPasswordForAdmins123!@#"),
                 Role = UserRole.Admin,
+                PhoneNumber = request.PhoneNumber,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 IsDeleted = false,
@@ -53,13 +51,12 @@ namespace E_commerce_Admin_Dashboard.Mappers
             {
                 UserId = user.Id,
                 Email = user.Email,
-
+                PhoneNumber = user.PhoneNumber,
+                CreatedAt= user.CreatedAt,
+                UpdatedAt= user.UpdatedAt,
                 AdminId = admin.Id,
                 Name = admin.Name,
-                PhoneNumber = admin.PhoneNumber,
-                IsSuperAdmin = admin.IsSuperAdmin,
-                CreatedAt = admin.CreatedAt,
-                UpdatedAt = admin.UpdatedAt,
+                IsSuperAdmin = admin.IsSuperAdmin
             };
         }
     }
