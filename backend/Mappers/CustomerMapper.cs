@@ -21,10 +21,7 @@ public class CustomerMapper : ICustomerMapper
             Email = user.Email,
             CustomerId = cus.Id,
             Name = cus.Name,
-            PhoneNumber = cus.PhoneNumber,
             DateOfBirth = cus.DateOfBirth,
-            CreatedAt = cus.CreatedAt,
-            UpdatedAt = cus.UpdatedAt,
             LoyaltyPoints = cus.LoyaltyPoints
         };
     }
@@ -35,6 +32,7 @@ public class CustomerMapper : ICustomerMapper
         {
             Id = Guid.NewGuid(),
             Email = req.Email,
+            PhoneNumber = req.PhoneNumber,
             Password = _passwordHasher.Hash(req.Password),
             Role = UserRole.Customer,
             CreatedAt = DateTime.UtcNow,
@@ -53,10 +51,7 @@ public class CustomerMapper : ICustomerMapper
             UserId = user.Id,
             User = user,
             Name = req.Name,
-            PhoneNumber = req.PhoneNumber,
             DateOfBirth = req.DateOfBirth,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
             IsDeleted = false,
             LoyaltyPoints = 0,
         };
@@ -92,11 +87,11 @@ public class CustomerMapper : ICustomerMapper
             UserId = user.Id,
             Email = user.Email,
             CustomerId = customer.Id,
+            PhoneNumber = user.PhoneNumber,
+            UpdatedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow,
             Name = customer.Name,
-            PhoneNumber = customer.PhoneNumber,
             DateOfBirth = customer.DateOfBirth,
-            CreatedAt = customer.CreatedAt,
-            UpdatedAt = customer.UpdatedAt,
             LoyaltyPoints= customer.LoyaltyPoints,
         };
     }

@@ -26,10 +26,8 @@ namespace E_commerce_Admin_Dashboard.Controllers
             [FromQuery] string? search,
             [FromQuery] int limit = 10,
             [FromQuery] int page = 1,
-            [FromQuery] string? sort = "createdAt")
+            [FromQuery] string? sort = "name")
         {
-            var token = Request.Cookies["access_token"];
-
             var serviceResponse = await _adminService.GetAllAdminsAsync(search, limit, page, sort);
 
             if (!serviceResponse.OK)
@@ -43,9 +41,6 @@ namespace E_commerce_Admin_Dashboard.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAdminAsync([FromBody] CreateAdminRequest req)
         {
-            var token = Request.Cookies["access_token"];
-            if (token == null) return Unauthorized("Token missing.");
-
             var serviceResponse = await _adminService.CreateNewAdminAsync(req);
 
             if (!serviceResponse.OK)
@@ -58,24 +53,11 @@ namespace E_commerce_Admin_Dashboard.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAdminByIdAsync([FromRoute] Guid id)
         {
-            var token = Request.Cookies["access_token"];
-            if (token == null) return Unauthorized("Token missing.");
-
             var serviceResponse = await _adminService.GetAdminByIdAsync(id);
             if (!serviceResponse.OK)
                 return StatusCode(serviceResponse.StatusCode, serviceResponse);
 
             return Ok(serviceResponse);
-        }
-
-        // Update admin details
-        [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateAdminDetailsAsync([FromBody] UpdateAdminDetailsRequest req, [FromRoute] Guid id)
-        {
-            var serviceResult = await _adminService.UpdateAdminDetailsAsync(id, req);
-            if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, serviceResult);
-
-            return Ok(serviceResult);
         }
 
         // Delete admin by Id
@@ -94,9 +76,6 @@ namespace E_commerce_Admin_Dashboard.Controllers
         [HttpPatch("promote/{id}")]
         public async Task<IActionResult> PromoteToSuperAdminAsync([FromRoute] Guid id)
         {
-            var token = Request.Cookies["access_token"];
-            if (token == null) return Unauthorized("Missing token.");
-
             var serviceResult = await _adminService.PromoteAdminAsync(id);
             if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, serviceResult);
 
@@ -107,9 +86,6 @@ namespace E_commerce_Admin_Dashboard.Controllers
         [HttpPatch("demote/{id}")]
         public async Task<IActionResult> DemoteFromSuperAdminAsync([FromRoute] Guid id)
         {
-            var token = Request.Cookies["access_token"];
-            if (token == null) return Unauthorized("Missing token.");
-
             var serviceResult = await _adminService.DemoteAdminAsync(id);
             if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, serviceResult);
 

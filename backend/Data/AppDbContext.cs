@@ -57,10 +57,6 @@ public class AppDbContext : DbContext
             .HasIndex(u => u.Email)
             .IsUnique();
 
-        modelBuilder.Entity<Customer>()
-            .HasIndex(c => c.PhoneNumber)
-            .IsUnique();
-
         modelBuilder.Entity<Product>()
             .HasIndex(p => p.SKU)
             .IsUnique();
@@ -161,6 +157,7 @@ public class AppDbContext : DbContext
             Id = superAdminUserId,
             Email = "hponetaukyou@gmail.com",
             Password = "$2a$12$90UrUp1k5/Zmzx9b3Ms8YunIR5.zexGCRLj3G/ztUVzFUpQpFAC7.",
+            PhoneNumber = "+959890079614",
             Role = UserRole.Admin,
             CreatedAt = new DateTime(2025, 05, 21, 12, 00, 00, DateTimeKind.Utc),
             UpdatedAt = new DateTime(2025, 05, 21, 12, 00, 00, DateTimeKind.Utc)
@@ -171,10 +168,7 @@ public class AppDbContext : DbContext
             Id = superAdminId,
             UserId = superAdminUserId,
             Name = "Hpone Tauk Nyi",
-            PhoneNumber = "+959890079614",
             IsSuperAdmin = true,
-            CreatedAt = new DateTime(2025, 05, 21, 12, 00, 00, DateTimeKind.Utc),
-            UpdatedAt = new DateTime(2025, 05, 21, 12, 00, 00, DateTimeKind.Utc),
             IsDeleted = false,
             CreatedBy = null
         });

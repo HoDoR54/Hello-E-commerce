@@ -20,12 +20,6 @@ namespace E_commerce_Admin_Dashboard.Models
         [StringLength(100)]
         public string Name { get; set; }
 
-        [Phone]
-        [StringLength(20)]
-        public string PhoneNumber { get; set; }
-
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
         public bool IsDeleted { get; set; } = false;
 
         [Required]

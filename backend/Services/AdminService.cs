@@ -126,54 +126,5 @@ namespace E_commerce_Admin_Dashboard.Services
             var response = _adminMapper.ToAdminResponse(matchedUser, promotedAdmin);
             return ServiceResult<AdminResponse>.Success(response, 200);
         }
-
-        public async Task<ServiceResult<AdminResponse>> UpdateAdminDetailsAsync(Guid id, UpdateAdminDetailsRequest req)
-        {
-            if (req == null)
-                return ServiceResult<AdminResponse>.Fail("Request is empty.", 400);
-
-            var user = await _userRepo.GetUserByIdAsync(id);
-            if (user == null)
-                return ServiceResult<AdminResponse>.Fail("No user found.", 404);
-
-            var admin = await _adminRepo.GetAdminByUserIdAsync(id);
-            if (admin == null)
-                return ServiceResult<AdminResponse>.Fail("No admin record found.", 404);
-
-            string email = user.Email;
-            string name = admin.Name;
-            string phoneNumber = admin.PhoneNumber;
-
-            if (!string.IsNullOrWhiteSpace(req.Email) && req.Email != user.Email)
-            {
-                var updated = await _userRepo.UpdateEmailAsync(user.Id, req.Email);
-                if (updated == null)
-                    return ServiceResult<AdminResponse>.Fail("Failed to update email.", 500);
-                email = updated;
-            }
-
-            if (!string.IsNullOrWhiteSpace(req.Name) && req.Name != admin.Name)
-            {
-                var updated = await _adminRepo.UpdateNameAsync(user.Id, req.Name);
-                if (updated == null)
-                    return ServiceResult<AdminResponse>.Fail("Failed to update name.", 500);
-                name = req.Name;
-            }
-
-            if (!string.IsNullOrWhiteSpace(req.PhoneNumber) && req.PhoneNumber != admin.PhoneNumber)
-            {
-                var updated = await _adminRepo.UpdatePhoneNumAsync(user.Id, req.PhoneNumber);
-                if (updated == null)
-                    return ServiceResult<AdminResponse>.Fail("Failed to update phone number.", 500);
-                phoneNumber = req.PhoneNumber;
-            }
-
-            var updatedUser = await _userRepo.GetUserByIdAsync(user.Id);
-            var updatedAdmin = await _adminRepo.GetAdminByUserIdAsync(user.Id);
-
-            var response = _adminMapper.ToAdminResponse(updatedUser, updatedAdmin);
-
-            return ServiceResult<AdminResponse>.Success(response, 200);
-        }
     }
 }

@@ -25,6 +25,7 @@ namespace E_commerce_Admin_Dashboard.Mappers
             {
                 Id = userModel.Id,
                 Email = userModel.Email,
+                PhoneNumber = userModel.PhoneNumber,
                 Role = userModel.Role,
                 IsWarned = userModel.IsWarned,
                 WarningLevel = userModel.WarningLevel,

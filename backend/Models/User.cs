@@ -20,6 +20,11 @@ namespace E_commerce_Admin_Dashboard.Models
         [StringLength(100)]
         public string Email { get; set; }
 
+        [Phone]
+        [StringLength(20)]
+        public string PhoneNumber { get; set; }
+
+
         [Required]
         [StringLength(255)]
         public string Password { get; set; }

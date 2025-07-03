@@ -22,11 +22,6 @@ namespace E_commerce_Admin_Dashboard.Models
 
         [Phone]
         [StringLength(20)]
-        public string PhoneNumber { get; set; }
-
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-
         public bool IsDeleted { get; set; }
         public bool IsSuperAdmin { get; set; }
 
