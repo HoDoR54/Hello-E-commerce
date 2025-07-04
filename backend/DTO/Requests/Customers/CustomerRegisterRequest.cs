@@ -1,6 +1,6 @@
 ﻿using E_commerce_Admin_Dashboard.Models;
 
-namespace E_commerce_Admin_Dashboard.DTO.Requests.Auth
+namespace E_commerce_Admin_Dashboard.DTO.Requests.Customers
 {
     public class CustomerRegisterRequest
     {

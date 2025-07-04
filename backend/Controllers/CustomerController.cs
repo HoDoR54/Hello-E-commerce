@@ -21,10 +21,12 @@ namespace E_commerce_Admin_Dashboard.Controllers
             [FromQuery] string? search,
             [FromQuery] int limit = 10,
             [FromQuery] int page = 1,
-            [FromQuery] string? sort = "createdAt"
+            [FromQuery] string? sort = "name"
             )
         {
-            return Ok();
+            var serviceResult = await _customerService.GetAllCustomersAsync(page, limit, search, sort);
+
+            return StatusCode(serviceResult.StatusCode, serviceResult);
         }
     }
 }
