@@ -1,6 +1,6 @@
-﻿namespace E_commerce_Admin_Dashboard.DTO.Requests.Auth
+﻿namespace E_commerce_Admin_Dashboard.DTO.Responses.Customers
 {
-    public class CustomerAddressCreateRequest
+    public class CustomerAddressResponse
     {
         public string Street { get; set; }
         public string City { get; set; }

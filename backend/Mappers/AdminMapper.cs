@@ -1,5 +1,6 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Requests.Admins;
 using E_commerce_Admin_Dashboard.DTO.Responses.Admins;
+using E_commerce_Admin_Dashboard.DTO.Responses.Auth;
 using E_commerce_Admin_Dashboard.Interfaces.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Mappers;
 using E_commerce_Admin_Dashboard.Models;
@@ -47,16 +48,26 @@ namespace E_commerce_Admin_Dashboard.Mappers
 
         public AdminResponse ToAdminResponse(User user, Admin admin)
         {
+            UserResponse userResponse = new UserResponse
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Role = user.Role,
+                PhoneNumber= user.PhoneNumber,
+                CreatedAt   = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt,
+                IsWarned = user.IsWarned,
+                WarningLevel = user.WarningLevel,
+                IsBanned = user.IsBanned,
+                BannedDays = user.BannedDays,
+            };
             return new AdminResponse
             {
-                UserId = user.Id,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                CreatedAt= user.CreatedAt,
-                UpdatedAt= user.UpdatedAt,
+                User = userResponse,
                 AdminId = admin.Id,
                 Name = admin.Name,
-                IsSuperAdmin = admin.IsSuperAdmin
+                IsSuperAdmin = admin.IsSuperAdmin,
+                CreatedBy  = admin.CreatedBy,
             };
         }
     }
