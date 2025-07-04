@@ -4,8 +4,6 @@ using E_commerce_Admin_Dashboard.DTO.Requests.Customers;
 using E_commerce_Admin_Dashboard.DTO.Responses.Auth;
 using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Helpers;
-using E_commerce_Admin_Dashboard.Interfaces.Services;
-using E_commerce_Admin_Dashboard.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_commerce_Admin_Dashboard.Controllers
@@ -23,19 +21,19 @@ namespace E_commerce_Admin_Dashboard.Controllers
             _cookiesHelper = cookiesHelper;
         }
 
-        [HttpPost("/admins/login")]
+        [HttpPost("admins/login")]
         public async Task<IActionResult> AdminLoginAsync([FromBody] LoginRequest request)
         {
             var loginResult = await _authServices.LoginAdminAsync(request);
-            if (!loginResult.OK)
-                return StatusCode(loginResult.StatusCode, loginResult);
 
-            var tokenResult = await _authServices.GenerateTokenPairAsync(loginResult.Data.User.Email);
-            if (!tokenResult.OK)
-                return StatusCode(tokenResult.StatusCode, tokenResult);
-
-            _cookiesHelper.SetRefreshTokenCookies(Response, tokenResult.Data.RefreshToken);
-            _cookiesHelper.SetAccessTokenCookies(Response, tokenResult.Data.AccessToken);
+            if (loginResult.OK)
+            {
+                var tokenResult = await _authServices.GenerateTokenPairAsync(loginResult.Data.User.Email);
+                if (!tokenResult.OK)
+                    return StatusCode(tokenResult.StatusCode, tokenResult);
+                _cookiesHelper.SetRefreshTokenCookies(Response, tokenResult.Data.RefreshToken);
+                _cookiesHelper.SetAccessTokenCookies(Response, tokenResult.Data.AccessToken);
+            }
 
             return StatusCode(loginResult.StatusCode, loginResult);
         }
@@ -44,15 +42,15 @@ namespace E_commerce_Admin_Dashboard.Controllers
         public async Task<IActionResult> CustomerLoginAsync([FromBody] LoginRequest request)
         {
             var loginResult = await _authServices.LoginCustomerAsync(request);
-            if (!loginResult.OK)
-                return StatusCode(loginResult.StatusCode, loginResult);
+            if (loginResult.OK)
+            {
+                var tokenResult = await _authServices.GenerateTokenPairAsync(loginResult.Data.User.Email);
+                if (!tokenResult.OK)
+                    return StatusCode(tokenResult.StatusCode, tokenResult);
 
-            var tokenResult = await _authServices.GenerateTokenPairAsync(loginResult.Data.User.Email);
-            if (!tokenResult.OK)
-                return StatusCode(tokenResult.StatusCode, tokenResult);
-
-            _cookiesHelper.SetRefreshTokenCookies(Response, tokenResult.Data.RefreshToken);
-            _cookiesHelper.SetAccessTokenCookies(Response, tokenResult.Data.AccessToken);
+                _cookiesHelper.SetRefreshTokenCookies(Response, tokenResult.Data.RefreshToken);
+                _cookiesHelper.SetAccessTokenCookies(Response, tokenResult.Data.AccessToken);
+            }
 
             return StatusCode(loginResult.StatusCode, loginResult);
         }
@@ -61,15 +59,15 @@ namespace E_commerce_Admin_Dashboard.Controllers
         public async Task<IActionResult> CustomerRegisterAsync([FromBody] CustomerRegisterRequest request)
         {
             var registerResult = await _authServices.RegisterCustomerAsync(request);
-            if (!registerResult.OK)
-                return StatusCode(registerResult.StatusCode, registerResult);
+            if (registerResult.OK)
+            {
+                var tokenResult = await _authServices.GenerateTokenPairAsync(request.Email);
+                if (!tokenResult.OK)
+                    return StatusCode(tokenResult.StatusCode, tokenResult);
 
-            var tokenResult = await _authServices.GenerateTokenPairAsync(request.Email);
-            if (!tokenResult.OK)
-                return StatusCode(tokenResult.StatusCode, tokenResult);
-
-            _cookiesHelper.SetRefreshTokenCookies(Response, tokenResult.Data.RefreshToken);
-            _cookiesHelper.SetAccessTokenCookies(Response, tokenResult.Data.AccessToken);
+                _cookiesHelper.SetRefreshTokenCookies(Response, tokenResult.Data.RefreshToken);
+                _cookiesHelper.SetAccessTokenCookies(Response, tokenResult.Data.AccessToken);
+            }
 
             return StatusCode(registerResult.StatusCode, registerResult);
         }
@@ -79,7 +77,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
         {
             var accessToken = Request.Cookies["access_token"];
             if (accessToken == null)
-                return Unauthorized(ServiceResult<object>.Fail("No access token found.", 401));
+                return Unauthorized(ServiceResult<object>.Fail("Missing access token.", 401));
 
             var validationResult = await _authServices.ValidateTokenAsync(accessToken, TokenType.Access);
             if (!validationResult.OK)
@@ -99,7 +97,7 @@ namespace E_commerce_Admin_Dashboard.Controllers
 
             if (string.IsNullOrEmpty(refreshToken))
             {
-                return StatusCode(401, ServiceResult<object?>.Fail("No refresh token found in the request.", 401));
+                return StatusCode(401, ServiceResult<object?>.Fail("Missing refresh token.", 401));
             }
 
             var refreshCheck = await _authServices.ValidateTokenAsync(refreshToken, TokenType.Refresh);

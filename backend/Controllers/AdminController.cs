@@ -31,9 +31,6 @@ namespace E_commerce_Admin_Dashboard.Controllers
         {
             var serviceResult = await _adminService.GetAllAdminsAsync(search, limit, page, sort);
 
-            if (!serviceResult.OK)
-                return StatusCode(serviceResult.StatusCode, serviceResult);
-
             return StatusCode(serviceResult.StatusCode, serviceResult);
         }
 
@@ -44,9 +41,6 @@ namespace E_commerce_Admin_Dashboard.Controllers
         {
             var serviceResult = await _adminService.CreateNewAdminAsync(req);
 
-            if (!serviceResult.OK)
-                return StatusCode(serviceResult.StatusCode, serviceResult);
-
             return StatusCode(serviceResult.StatusCode, serviceResult);
         }
 
@@ -55,8 +49,6 @@ namespace E_commerce_Admin_Dashboard.Controllers
         public async Task<IActionResult> GetAdminByIdAsync([FromRoute] Guid id)
         {
             var serviceResult = await _adminService.GetAdminByIdAsync(id);
-            if (!serviceResult.OK)
-                return StatusCode(serviceResult.StatusCode, serviceResult);
 
             return StatusCode(serviceResult.StatusCode, serviceResult);
         }
@@ -67,7 +59,6 @@ namespace E_commerce_Admin_Dashboard.Controllers
         public async Task<IActionResult> DeleteAdminByIdAsync([FromRoute] Guid id)
         {
             var serviceResult = await _adminService.DeleteAdminByIdAsync(id);
-            if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, serviceResult);
 
             return StatusCode(serviceResult.StatusCode, serviceResult);
         }
@@ -78,7 +69,6 @@ namespace E_commerce_Admin_Dashboard.Controllers
         public async Task<IActionResult> PromoteToSuperAdminAsync([FromRoute] Guid id)
         {
             var serviceResult = await _adminService.PromoteAdminAsync(id);
-            if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, serviceResult);
 
             return StatusCode(serviceResult.StatusCode, serviceResult);
         }
@@ -88,7 +78,6 @@ namespace E_commerce_Admin_Dashboard.Controllers
         public async Task<IActionResult> DemoteFromSuperAdminAsync([FromRoute] Guid id)
         {
             var serviceResult = await _adminService.DemoteAdminAsync(id);
-            if (!serviceResult.OK) return StatusCode(serviceResult.StatusCode, serviceResult);
 
             return StatusCode(serviceResult.StatusCode, serviceResult);
         }
