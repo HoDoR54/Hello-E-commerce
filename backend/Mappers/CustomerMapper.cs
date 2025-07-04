@@ -1,5 +1,6 @@
-﻿using E_commerce_Admin_Dashboard.DTO.Requests.Auth;
+﻿using E_commerce_Admin_Dashboard.DTO.Requests.Customers;
 using E_commerce_Admin_Dashboard.DTO.Responses.Auth;
+using E_commerce_Admin_Dashboard.DTO.Responses.Customers;
 using E_commerce_Admin_Dashboard.Interfaces.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Mappers;
 using E_commerce_Admin_Dashboard.Models;
@@ -13,12 +14,24 @@ public class CustomerMapper : ICustomerMapper
         _passwordHasher = passwordHasher;
     }
 
-    public CustomerResponse ToCustomerLoginResponse(User user, Customer cus)
+    public CustomerResponse ToCustomerResponse(User user, Customer cus)
     {
+        UserResponse userResponse = new UserResponse
+        {
+            Id = user.Id,
+            Email = user.Email,
+            Role = user.Role,
+            PhoneNumber = user.PhoneNumber,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt,
+            IsWarned = user.IsWarned,
+            WarningLevel = user.WarningLevel,
+            IsBanned = user.IsBanned,
+            BannedDays = user.BannedDays,
+        };
         return new CustomerResponse
         {
-            UserId = user.Id,
-            Email = user.Email,
+            User = userResponse,
             CustomerId = cus.Id,
             Name = cus.Name,
             DateOfBirth = cus.DateOfBirth,
@@ -80,12 +93,24 @@ public class CustomerMapper : ICustomerMapper
         };
     }
 
-    public  CustomerResponse CustomerRegisterModelsToResponse(User user, Customer customer, CustomerAddress address)
+    public  CustomerResponse ToCustomerResponse(User user, Customer customer, CustomerAddress address)
     {
+        UserResponse userResponse = new UserResponse
+        {
+            Id = user.Id,
+            Email = user.Email,
+            Role = user.Role,
+            PhoneNumber = user.PhoneNumber,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt,
+            IsWarned = user.IsWarned,
+            WarningLevel = user.WarningLevel,
+            IsBanned = user.IsBanned,
+            BannedDays = user.BannedDays,
+        };
         return new CustomerResponse
         {
-            UserId = user.Id,
-            Email = user.Email,
+            User = userResponse,
             CustomerId = customer.Id,
             PhoneNumber = user.PhoneNumber,
             UpdatedAt = DateTime.UtcNow,

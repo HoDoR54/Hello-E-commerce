@@ -1,6 +1,8 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Requests.Auth;
+using E_commerce_Admin_Dashboard.DTO.Requests.Customers;
 using E_commerce_Admin_Dashboard.DTO.Responses.Admins;
 using E_commerce_Admin_Dashboard.DTO.Responses.Auth;
+using E_commerce_Admin_Dashboard.DTO.Responses.Customers;
 using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Mappers;
@@ -45,26 +47,36 @@ namespace Services
             _generalMapper = generalMapper;
         }
 
-        public async Task<ServiceResult<UserResponse>> LoginAsync(LoginRequest request)
+        public async Task<ServiceResult<AdminResponse>> LoginAdminAsync(LoginRequest request)
         {
             var user = await _authRepo.GetUserByEmailAsync(request.Email);
-            if (user == null) return ServiceResult<UserResponse>.Fail("User not found.", 404);
+            if (user == null) return ServiceResult<AdminResponse>.Fail("User not found.", 404);
 
-            if (user.Role == UserRole.Admin)
-            {
-                var admin = await _authRepo.GetAdminByUserIdAsync(user.Id);
-                if (admin == null) return ServiceResult<UserResponse>.Fail("No admin record found.", 404);
-            } else if (user.Role == UserRole.Customer)
-            {
-                var customer = await _authRepo.GetCustomerByUserIdAsync(user.Id);
-                if (customer == null) return ServiceResult<UserResponse>.Fail("User is not a customer.", 404);
-            }
+
+            var admin = await _authRepo.GetAdminByUserIdAsync(user.Id);
+            if (admin == null) return ServiceResult<AdminResponse>.Fail("No admin record found.", 404);
 
             if (!_passwordHasher.Verify(request.Password, user.Password))
-                return ServiceResult<UserResponse>.Fail("Incorrect password.", 401);
+                return ServiceResult<AdminResponse>.Fail("Incorrect password.", 401);
 
-            var response = _generalMapper.UserModelToResponse(user);
-            return ServiceResult<UserResponse>.Success(response, 200);
+            var response = _adminMapper.ToAdminResponse(user, admin);
+            return ServiceResult<AdminResponse>.Success(response, 200);
+        }
+
+        public async Task<ServiceResult<CustomerResponse>> LoginCustomerAsync(LoginRequest request)
+        {
+            var user = await _authRepo.GetUserByEmailAsync(request.Email);
+            if (user == null) return ServiceResult<CustomerResponse>.Fail("User not found.", 404);
+
+
+            var customer = await _authRepo.GetCustomerByUserIdAsync(user.Id);
+            if (customer == null) return ServiceResult<CustomerResponse>.Fail("No customer record found.", 404);
+
+            if (!_passwordHasher.Verify(request.Password, user.Password))
+                return ServiceResult<CustomerResponse>.Fail("Incorrect password.", 401);
+
+            var response = _customerMapper.ToCustomerResponse(user, customer);
+            return ServiceResult<CustomerResponse>.Success(response, 200);
         }
 
         public async Task<ServiceResult<CustomerResponse>> RegisterCustomerAsync(CustomerRegisterRequest request)
@@ -98,7 +110,7 @@ namespace Services
                 await _customerRepo.AddNewCustomerAddressDetailAsync(customerAddressDetail);
             }
 
-            var response = _customerMapper.CustomerRegisterModelsToResponse(newUser, newCustomer, formattedAddress);
+            var response = _customerMapper.ToCustomerResponse(newUser, newCustomer, formattedAddress);
             return ServiceResult<CustomerResponse>.Success(response, 201);
         }
 

@@ -1,4 +1,4 @@
-﻿using E_commerce_Admin_Dashboard.DTO.Responses.Auth;
+﻿using E_commerce_Admin_Dashboard.DTO.Responses.Customers;
 using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Services;
 

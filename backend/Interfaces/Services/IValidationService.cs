@@ -1,5 +1,5 @@
 ﻿using E_commerce_Admin_Dashboard.DTO.Requests.Admins;
-using E_commerce_Admin_Dashboard.DTO.Requests.Auth;
+using E_commerce_Admin_Dashboard.DTO.Requests.Customers;
 using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Models;
 
