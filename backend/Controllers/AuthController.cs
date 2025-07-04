@@ -4,8 +4,6 @@ using E_commerce_Admin_Dashboard.DTO.Requests.Customers;
 using E_commerce_Admin_Dashboard.DTO.Responses.Auth;
 using E_commerce_Admin_Dashboard.Helpers;
 using E_commerce_Admin_Dashboard.Interfaces.Helpers;
-using E_commerce_Admin_Dashboard.Interfaces.Services;
-using E_commerce_Admin_Dashboard.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_commerce_Admin_Dashboard.Controllers
